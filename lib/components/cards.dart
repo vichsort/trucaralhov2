@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../logic/truco.dart'; // Importando a camada de serviço
+import '../logic/truco.dart';
 
 Widget buildCardBack() {
       return Image.asset(

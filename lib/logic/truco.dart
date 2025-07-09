@@ -97,9 +97,7 @@ class TrucoGame {
 
     // Remove a carta da mão do jogador
     Carta cartaJogada = maoJogador.removeAt(indiceCarta);
-
-    // Aqui você pode implementar a lógica para comparar as cartas
-    // e determinar o vencedor da rodada.
+//pensar melhor isso
     print("${isJogador1 ? 'Jogador 1' : 'Jogador 2'} jogou a carta: $cartaJogada");
 
     // Aqui você pode implementar a comparação das cartas
@@ -112,21 +110,15 @@ class TrucoGame {
     }
 
     void _onCartaTapped(int index) {
-  
-  // A carta foi jogada pelo jogador 1 (você)
+  // isso ainda tem erro
   bool isJogador1 = true;
-
-  // Chama o método para jogar a carta
   game.jogarCarta(index, isJogador1);
 
-  // Atualiza a UI, removendo a carta da mão do jogador
   setState(() {
-    // Atualize a mão do jogador, ou a rodada, conforme necessário
+    // Atualizara  mão, mas nao sei como
   });
 }
 
-    // Após a carta ser jogada, verifique a pontuação ou faça outras operações
-    // Exemplo: Comparação entre as cartas
     if (maoJogador1.isNotEmpty && maoJogador2.isNotEmpty) {
       Carta cartaJogador1 = maoJogador1.last;
       Carta cartaJogador2 = maoJogador2.last;
