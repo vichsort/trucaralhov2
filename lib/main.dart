@@ -53,7 +53,18 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
         }
       });
     } catch (e) {
-      debugPrint('Erro ao iniciar o jogo: $e');
+      // Tratamento de erro pra se der erro
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao carregar cartas: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        player1Cards = [];
+        player2Cards = [];
+        tableCard = [];
+      });
     } finally {
       setState(() {
         isLoading = false;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../logic/truco.dart'; // Importando a camada de serviço
 
 Widget buildCardBack() {
       return Image.asset(
@@ -7,7 +8,7 @@ Widget buildCardBack() {
       height: 120,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
-      
+      // se for dar erro, chega nesse negócio aqui
       return Container(
         width: 80,
         height: 120,
@@ -26,6 +27,7 @@ Widget buildCardBack() {
     return GestureDetector(
       onTap: () {
         debugPrint('Carta clicada: $imageUrl');
+        _onCartaTapped(index);
       },
       child: Container(
         width: 80,
