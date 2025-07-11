@@ -4,9 +4,7 @@ import './components/cards.dart';
 import './requests.dart';
 
 void main() {
-  runApp(MaterialApp(
-    home: TrucoHomePage(),
-  ));
+  runApp(MaterialApp(home: TrucoHomePage()));
 }
 
 late TrucoGame game;
@@ -49,7 +47,9 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
     try {
       game = TrucoGame();
       // Aqui usamos o serviço para pegar as cartas
-      List<String> validCards = await deckService.drawCards(15); // Pega 15 cartas
+      List<String> validCards = await deckService.drawCards(
+        15,
+      ); // Pega 15 cartas
 
       setState(() {
         if (validCards.length >= 6) {
@@ -61,7 +61,11 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
           player2Cards = validCards.skip(3).toList();
         }
       });
-      game.iniciarRodada(validCards.map((url) => Carta(valor: 'A', naipe: Naipe.hearts, imageUrl: url)).toList());
+      game.iniciarRodada(
+        validCards
+            .map((url) => Carta(valor: 'A', naipe: Naipe.hearts, imageUrl: url))
+            .toList(),
+      );
     } catch (e) {
       // Tratamento de erro pra se der erro
       ScaffoldMessenger.of(context).showSnackBar(
@@ -81,12 +85,17 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
       });
     }
   }
-  
+
   void onCartaTapped(int index) {
-    game.onCartaTapped(index); 
+    String cartaJogada = player1Cards[index];
+
+    // Adiciona a carta à mesa
     setState(() {
+      tableCard.add(cartaJogada);
       player1Cards.removeAt(index);
     });
+
+    game.onCartaTapped(index);
   }
 
   @override
@@ -156,7 +165,7 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Carta na Mesa',
+            'Cartas na Mesa',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -167,7 +176,15 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
           if (isLoading)
             const CircularProgressIndicator()
           else
-            buildTableCard(tableCard.first)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: tableCard.map((imageUrl) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: buildTableCard(imageUrl),
+                );
+              }).toList(),
+            ),
         ],
       ),
     );
