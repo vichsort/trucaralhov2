@@ -25,8 +25,6 @@ class TrucoGame {
   int pontosTime2 = 0;
   int valorRodada = 1;
 
-  
-
   void iniciarRodada(List<Carta> cartasDistribuidas) {
     if (cartasDistribuidas.length < 7) {
       throw Exception("Cartas insuficientes");
@@ -65,9 +63,12 @@ class TrucoGame {
   }
 
   void pedirTruco() {
-    if (valorRodada == 1) valorRodada = 3;
-    else if (valorRodada == 3) valorRodada = 6;
-    else if (valorRodada == 6) valorRodada = 9;
+    if (valorRodada == 1)
+      valorRodada = 3;
+    else if (valorRodada == 3)
+      valorRodada = 6;
+    else if (valorRodada == 6)
+      valorRodada = 9;
   }
 
   void aceitarTruco() {
@@ -97,8 +98,10 @@ class TrucoGame {
 
     // Remove a carta da mão do jogador
     Carta cartaJogada = maoJogador.removeAt(indiceCarta);
-//pensar melhor isso
-    print("${isJogador1 ? 'Jogador 1' : 'Jogador 2'} jogou a carta: $cartaJogada");
+    //pensar melhor isso
+    print(
+      "${isJogador1 ? 'Jogador 1' : 'Jogador 2'} jogou a carta: $cartaJogada",
+    );
 
     // Aqui você pode implementar a comparação das cartas
     if (isJogador1) {
@@ -108,16 +111,6 @@ class TrucoGame {
       // Jogador 2 (oponente) jogou
       print("Jogador 2 jogou a carta: $cartaJogada");
     }
-
-    void _onCartaTapped(int index) {
-  // isso ainda tem erro
-  bool isJogador1 = true;
-  game.jogarCarta(index, isJogador1);
-
-  setState(() {
-    // Atualizara  mão, mas nao sei como
-  });
-}
 
     if (maoJogador1.isNotEmpty && maoJogador2.isNotEmpty) {
       Carta cartaJogador1 = maoJogador1.last;
@@ -130,5 +123,10 @@ class TrucoGame {
         pontosTime2 += valorRodada;
       }
     }
-}
   }
+
+  void onCartaTapped(int index) {
+    bool isJogador1 = true;
+    jogarCarta(index, isJogador1);
+  }
+}

@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import './logic/truco.dart';
 import './components/cards.dart';
-import './requests.dart'; // Importando a camada de serviço
+import './requests.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: TrucoHomePage(),
+  ));
+}
 
 late TrucoGame game;
 
@@ -13,6 +19,8 @@ class TrucoHomePage extends StatefulWidget {
 }
 
 class _TrucoHomePageState extends State<TrucoHomePage> {
+  // Isso dá não inicializado toda hora, então inicializei aqui por que to nervoso
+  TrucoGame game = TrucoGame();
   // Carta da mesa (visível para ambos os jogadores)
   List<String> tableCard = [];
   // Cartas do Jogador 1 (você - visíveis)
@@ -39,6 +47,7 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
     });
 
     try {
+      game = TrucoGame();
       // Aqui usamos o serviço para pegar as cartas
       List<String> validCards = await deckService.drawCards(15); // Pega 15 cartas
 
@@ -52,6 +61,7 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
           player2Cards = validCards.skip(3).toList();
         }
       });
+      game.iniciarRodada(validCards.map((url) => Carta(valor: 'A', naipe: Naipe.hearts, imageUrl: url)).toList());
     } catch (e) {
       // Tratamento de erro pra se der erro
       ScaffoldMessenger.of(context).showSnackBar(
@@ -70,6 +80,13 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
         isLoading = false;
       });
     }
+  }
+  
+  void onCartaTapped(int index) {
+    game.onCartaTapped(index); 
+    setState(() {
+      player1Cards.removeAt(index);
+    });
   }
 
   @override
@@ -150,7 +167,7 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
           if (isLoading)
             const CircularProgressIndicator()
           else
-            buildCardFront(tableCard.first)
+            buildTableCard(tableCard.first)
         ],
       ),
     );
@@ -176,10 +193,16 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
           else if (player1Cards.isNotEmpty)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: player1Cards.map((imageUrl) {
+              children: player1Cards.asMap().entries.map((entry) {
+                int index = entry.key;
+                String imageUrl = entry.value;
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: buildCardFront(imageUrl),
+                  child: buildCardFront(
+                    imageUrl,
+                    index,
+                    onCartaTapped, // Passa a função de callback
+                  ),
                 );
               }).toList(),
             )
