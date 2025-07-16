@@ -165,7 +165,7 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Cartas na Mesa',
+            'Cartas na MesaA',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
