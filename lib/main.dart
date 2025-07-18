@@ -96,6 +96,24 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
     });
 
     game.onCartaTapped(index);
+    _opponentPlay();
+  }
+
+  Future<void> _opponentPlay() async {
+    if (player2Cards.isEmpty) return;
+
+    await Future.delayed(const Duration(seconds: 1)); // Simula tempo do bot
+
+    setState(() {
+      // Remove a primeira carta da mão do oponente
+      String cartaJogada = player2Cards.removeAt(0);
+
+      // Adiciona a carta jogada na mesa (onde mostramos a frente)
+      tableCard.add(cartaJogada);
+    });
+
+    // Atualiza a lógica do jogo
+    game.jogarCarta(0, false);
   }
 
   @override
