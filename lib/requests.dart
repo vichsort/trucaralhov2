@@ -18,43 +18,36 @@ class DeckService {
     }
   }
 
-  Future<List<String>> drawCards(int count) async {
-    if (deckId.isEmpty) {
-      await getNewDeck();
-    }
-
-    final url = Uri.parse(
-      'https://deckofcardsapi.com/api/deck/$deckId/draw/?count=$count',
-    );
-
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final cards = data['cards'];
-
-      // Definir as cartas válidas
-      final trucoValid = [
-        'ACE',
-        '2',
-        '3',
-        '4',
-        '5',
-        '6',
-        '7',
-        'JACK',
-        'QUEEN',
-        'KING',
-      ];
-
-      final validCards = cards
-          .where((card) => trucoValid.contains(card['value']))
-          .map<String>((card) => card['image'] as String)
-          .toList();
-
-      return validCards;
-    } else {
-      throw Exception('Falha ao carregar cartas');
-    }
+  Future<List<Map<String, dynamic>>> drawCards(int count) async {
+  if (deckId.isEmpty) {
+    await getNewDeck();
   }
+
+  final url = Uri.parse(
+    'https://deckofcardsapi.com/api/deck/$deckId/draw/?count=$count',
+  );
+
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    final cards = data['cards'];
+
+    final trucoValid = [
+      'ACE', '2', '3', '4', '5', '6', '7', 'JACK', 'QUEEN', 'KING'
+    ];
+
+    return cards
+        .where((card) => trucoValid.contains(card['value']))
+        .map<Map<String, dynamic>>((card) => {
+              'value': card['value'],
+              'suit': card['suit'],
+              'image': card['image'],
+            })
+        .toList();
+  } else {
+    throw Exception('Falha ao carregar cartas');
+  }
+}
+
 }
