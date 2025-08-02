@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import './logic/truco.dart';
-import './components/cards.dart';
-import './requests.dart';
+import './logic/truco.dart';        // Carta, TrucoGame, etc.
+import './components/cards.dart';  // buildCardFront/back/tableCard widgets
+import './requests.dart';          // DeckService
 
 void main() {
-  runApp(MaterialApp(home: TrucoHomePage()));
+  runApp(const MaterialApp(home: TrucoHomePage()));
 }
-
-late TrucoGame game;
 
 class TrucoHomePage extends StatefulWidget {
   const TrucoHomePage({super.key});
@@ -17,20 +15,21 @@ class TrucoHomePage extends StatefulWidget {
 }
 
 class _TrucoHomePageState extends State<TrucoHomePage> {
-  // Isso dá não inicializado toda hora, então inicializei aqui por que to nervoso
+  /// Estado do jogo lógico
   TrucoGame game = TrucoGame();
-  // Carta da mesa (visível para ambos os jogadores)
-  List<String> tableCard = [];
-  // Cartas do Jogador 1 (você - visíveis)
-  List<String> player1Cards = [];
 
-  // Cartas do Jogador 2 (oponente - ocultas, só sabemos quantas são)
-  List<String> player2Cards = [];
-  int player2CardCount = 0;
+  /// Cartas visíveis na mesa (tanto vira quanto cartas jogadas)
+  List<Carta> tableCards = [];
+
+  /// Cartas do Jogador 1 (você)
+  List<Carta> player1Cards = [];
+
+  /// Cartas do Jogador 2 (oponente) - guardamos as cartas completas, mas exibimos viradas
+  List<Carta> player2Cards = [];
 
   bool isLoading = false;
 
-  // Instancia o serviço de cartas
+  /// Serviço remoto
   final DeckService deckService = DeckService();
 
   @override
@@ -40,69 +39,89 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
   }
 
   Future<void> startGame() async {
-    setState(() {
-      isLoading = true;
-    });
+    setState(() => isLoading = true);
 
     try {
+      // Reinicia lógica
       game = TrucoGame();
-      // Aqui usamos o serviço para pegar as cartas
-      List<String> validCards = await deckService.drawCards(
-        15,
-      ); // Pega 15 cartas
 
+      // Busca cartas da API (List<Map<String,dynamic>>)
+      final apiCards = await deckService.drawCards(15);
+
+      // Converte para modelo interno (List<Carta>)
+      final cartas = apiCards.map((card) => Carta.fromApi(card)).toList();
+
+      // Inicializa rodada na lógica
+      game.iniciarRodada(cartas);
+
+      // Sincroniza estado visual
       setState(() {
-        if (validCards.length >= 6) {
-          tableCard = validCards.take(1).toList();
-          player1Cards = validCards.skip(1).take(3).toList();
-          player2Cards = validCards.skip(4).take(3).toList();
+        if (cartas.length >= 7) {
+          tableCards = [cartas[0]];             // vira
+          player1Cards = cartas.sublist(1, 4);  // 3 cartas
+          player2Cards = cartas.sublist(4, 7);  // 3 cartas
         } else {
-          player1Cards = validCards.take(3).toList();
-          player2Cards = validCards.skip(3).toList();
+          // fallback defensivo
+          player1Cards = cartas.take(3).toList();
+          player2Cards = cartas.skip(3).take(3).toList();
+          tableCards = [];
         }
       });
-      game.iniciarRodada(
-        validCards
-            .map((url) => Carta(valor: 'A', naipe: Naipe.hearts, imageUrl: url))
-            .toList(),
-      );
     } catch (e) {
-      // Tratamento de erro pra se der erro
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao carregar cartas: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao carregar cartas: $e')),
+        );
+      }
       setState(() {
         player1Cards = [];
         player2Cards = [];
-        tableCard = [];
+        tableCards = [];
       });
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
+  /// Jogador 1 toca numa carta
   void onCartaTapped(int index) {
-    String cartaJogada = player1Cards[index];
+    if (index < 0 || index >= player1Cards.length) return;
+    final cartaJogada = player1Cards[index];
 
-    // Adiciona a carta à mesa
     setState(() {
-      tableCard.add(cartaJogada);
+      tableCards.add(cartaJogada);
       player1Cards.removeAt(index);
     });
 
-    game.onCartaTapped(index);
+    // Atualiza lógica
+    game.jogarCartaObjeto(cartaJogada, isJogador1: true);
+
+    // Bot joga
+    _opponentPlay();
+  }
+
+  /// Jogada automática do oponente
+  Future<void> _opponentPlay() async {
+    if (player2Cards.isEmpty) return;
+
+    await Future.delayed(const Duration(seconds: 1)); // simula pensar
+
+    final cartaJogada = player2Cards.removeAt(0);
+
+    setState(() {
+      tableCards.add(cartaJogada);
+    });
+
+    game.jogarCartaObjeto(cartaJogada, isJogador1: false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage("images/fundo.jpg"),
             fit: BoxFit.cover,
@@ -110,13 +129,8 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
         ),
         child: ListView(
           children: [
-            // Área do Jogador 2 (Oponente) - Cartas Ocultas
             buildPlayer2Area(),
-
-            // Área da Mesa - Carta Visível
             buildTableCardArea(),
-
-            // Área do Jogador 1 (Você) - Cartas Visíveis
             buildPlayer1Area(),
           ],
         ),
@@ -144,7 +158,8 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
           else if (player2Cards.isNotEmpty)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: player2Cards.map((imageUrl) {
+              children: player2Cards.map((_) {
+                // carta virada
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: buildCardBack(),
@@ -165,7 +180,7 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Cartas na MesaA',
+            'Cartas na Mesa',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -178,10 +193,10 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
           else
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: tableCard.map((imageUrl) {
+              children: tableCards.map((carta) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: buildTableCard(imageUrl),
+                  child: buildTableCard(carta.imageUrl),
                 );
               }).toList(),
             ),
@@ -211,14 +226,14 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: player1Cards.asMap().entries.map((entry) {
-                int index = entry.key;
-                String imageUrl = entry.value;
+                final index = entry.key;
+                final carta = entry.value;
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: buildCardFront(
-                    imageUrl,
+                    carta.imageUrl,
                     index,
-                    onCartaTapped, // Passa a função de callback
+                    onCartaTapped,
                   ),
                 );
               }).toList(),
@@ -227,7 +242,7 @@ class _TrucoHomePageState extends State<TrucoHomePage> {
             const Text('Nenhuma carta disponível'),
           const SizedBox(height: 30),
           ElevatedButton(
-            onPressed: isLoading ? null : () => startGame(),
+            onPressed: isLoading ? null : startGame,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green[700],
               foregroundColor: Colors.white,
