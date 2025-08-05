@@ -31,7 +31,7 @@ String normalizeValor(String value) {
 }
 
 class Carta {
-  final String valor;   // "4","5","6","7","Q","J","K","A","2","3"
+  final String valor; // "4","5","6","7","Q","J","K","A","2","3"
   final Naipe naipe;
   final String imageUrl;
 
@@ -49,9 +49,6 @@ class Carta {
     const ordem = ["4", "5", "6", "7", "Q", "J", "K", "A", "2", "3"];
     return ordem.indexOf(valor.toUpperCase());
   }
-
-  @override
-  String toString() => '$valor de $naipe';
 }
 
 class TrucoGame {
@@ -111,7 +108,9 @@ class TrucoGame {
     }
   }
 
-  void aceitarTruco() {/* mantém valor */}
+  void aceitarTruco() {
+    /* mantém valor */
+  }
 
   void correr(bool jogador1Correu) {
     if (jogador1Correu) {

@@ -34,7 +34,7 @@ class _TrucoPageState extends State<TrucoPage> {
     startGame();
   }
 
-  void onCartaTapped(int index) {
+  void onCardTapped(int index) {
     if (index < 0 || index >= player1Cards.length) return;
     final cartaJogada = player1Cards[index];
 
@@ -139,7 +139,7 @@ class _TrucoPageState extends State<TrucoPage> {
           children: [
             buildPlayer2Area(player2Cards, isLoading),
             buildTableCardArea(tableCards, isLoading),
-            buildPlayer1Area(player1Cards, isLoading, onCartaTapped, startGame),
+            buildPlayer1Area(player1Cards, isLoading, onCardTapped, startGame),
           ],
         ),
       ),

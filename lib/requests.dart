@@ -10,7 +10,7 @@ class DeckService {
     );
     final response = await http.get(url);
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 && response.body.isNotEmpty) {
       final data = jsonDecode(response.body);
       deckId = data['deck_id'];
     } else {
@@ -28,7 +28,7 @@ class DeckService {
     );
     final response = await http.get(url);
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 && response.body.isNotEmpty) {
       final data = jsonDecode(response.body);
 
       // ⚠️ Verifica se o baralho não tem cartas suficientes
