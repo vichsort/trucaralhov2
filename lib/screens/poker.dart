@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../components/player_area.dart';
 import '../logic/bet.dart';
-import '../logic/fichas.dart';
+import '../logic/chip.dart';
 import '../logic/historico.dart';
 import '../logic/howTo.dart';
 
@@ -211,16 +211,16 @@ class _PokerPageState extends State<PokerPage> {
   Future<void> allInConfirm(String side) async {
     int playerValue = side == 'left' ? leftValue : rightValue;
 
-    var fichasDisponiveis = fichas
+    var chipsDisponiveis = chips
         .where((f) => f.valor * 10 <= playerValue)
         .toList();
-    if (fichasDisponiveis.isEmpty) {
+    if (chipsDisponiveis.isEmpty) {
       return showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
           title: Text('Saldo Insuficiente'),
           content: Text(
-            'Você não tem saldo suficiente para fazer ALL IN com 10 fichas.',
+            'Você não tem saldo suficiente para fazer ALL IN com 10 chips.',
           ),
           actions: [
             TextButton(
@@ -232,7 +232,7 @@ class _PokerPageState extends State<PokerPage> {
       );
     }
 
-    var fichaMaior = fichasDisponiveis.reduce(
+    var fichaMaior = chipsDisponiveis.reduce(
       (a, b) => a.valor > b.valor ? a : b,
     );
     int allInAmount = fichaMaior.valor * 10;
@@ -248,7 +248,7 @@ class _PokerPageState extends State<PokerPage> {
               children: <Widget>[
                 Text('Você tem certeza que quer dar ALL IN?'),
                 SizedBox(height: 10),
-                Text('Isso colocará 10 fichas ${fichaMaior.nome}.'),
+                Text('Isso colocará 10 chips ${fichaMaior.nome}.'),
                 Text('Equivalente a \$${allInAmount}'),
               ],
             ),

@@ -14,40 +14,56 @@ class DeckService {
       final data = jsonDecode(response.body);
       deckId = data['deck_id'];
     } else {
-      throw Exception('Falha ao carregar novo deck');
+      throw Exception('Falha ao carregar novo deck (API)');
     }
   }
 
   Future<List<Map<String, dynamic>>> drawCards(int count) async {
-  if (deckId.isEmpty) {
-    await getNewDeck();
-  }
+    if (deckId.isEmpty) {
+      await getNewDeck();
+    }
 
-  final url = Uri.parse(
-    'https://deckofcardsapi.com/api/deck/$deckId/draw/?count=$count',
-  );
+    final url = Uri.parse(
+      'https://deckofcardsapi.com/api/deck/$deckId/draw/?count=$count',
+    );
+    final response = await http.get(url);
 
-  final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
 
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    final cards = data['cards'];
+      // ⚠️ Verifica se o baralho não tem cartas suficientes
+      if (data['success'] == false || data['cards'] == null) {
+        await getNewDeck();
+        return drawCards(count);
+      }
 
-    final trucoValid = [
-      'ACE', '2', '3', '4', '5', '6', '7', 'JACK', 'QUEEN', 'KING'
-    ];
+      final cards = data['cards'];
 
-    return cards
-        .where((card) => trucoValid.contains(card['value']))
-        .map<Map<String, dynamic>>((card) => {
+      final trucoValid = [
+        'ACE',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        'JACK',
+        'QUEEN',
+        'KING',
+      ];
+
+      return cards
+          .where((card) => trucoValid.contains(card['value']))
+          .map<Map<String, dynamic>>(
+            (card) => {
               'value': card['value'],
               'suit': card['suit'],
               'image': card['image'],
-            })
-        .toList();
-  } else {
-    throw Exception('Falha ao carregar cartas');
+            },
+          )
+          .toList();
+    } else {
+      throw Exception('Falha ao carregar cartas (API)');
+    }
   }
-}
-
 }

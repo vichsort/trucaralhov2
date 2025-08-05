@@ -53,8 +53,18 @@ class _TrucoPageState extends State<TrucoPage> {
   void verifyEmpty() {
     if (player1Cards.isEmpty && player2Cards.isEmpty) {
       // Reinicia o jogo
+      callCards();
       startGame();
     }
+  }
+
+  Future<List<Carta>> callCards() async {
+    // Busca cartas da API (List<Map<String,dynamic>>)
+    final apiCards = await deckService.drawCards(15);
+
+    // Converte para modelo interno (List<Carta>)
+    final cartas = apiCards.map<Carta>((card) => Carta.fromApi(card)).toList();
+    return cartas;
   }
 
   Future<void> _opponentPlay() async {
@@ -79,11 +89,7 @@ class _TrucoPageState extends State<TrucoPage> {
       // Reinicia lógica
       game = TrucoGame();
 
-      // Busca cartas da API (List<Map<String,dynamic>>)
-      final apiCards = await deckService.drawCards(15);
-
-      // Converte para modelo interno (List<Carta>)
-      final cartas = apiCards.map((card) => Carta.fromApi(card)).toList();
+      final cartas = await callCards();
 
       // Inicializa rodada na lógica
       game.iniciarRodada(cartas);

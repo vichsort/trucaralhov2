@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'fichas.dart';
+import 'chip.dart';
 
 class BetPage extends StatefulWidget {
   const BetPage({Key? key}) : super(key: key);
@@ -84,9 +84,9 @@ class _BetPageState extends State<BetPage> {
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
                 ),
-                itemCount: fichas.length,
+                itemCount: chips.length,
                 itemBuilder: (context, index) {
-                  final ficha = fichas[index];
+                  final ficha = chips[index];
                   int count = selectedIndices[index] ?? 0;
 
                   return Card(
@@ -123,7 +123,7 @@ class _BetPageState extends State<BetPage> {
                                         } else {
                                           selectedIndices.remove(index);
                                         }
-                                        selectedValues -= fichas[index].valor;
+                                        selectedValues -= chips[index].valor;
                                         BetController.instance.save(
                                           selectedIndices,
                                           selectedValues,
@@ -146,7 +146,7 @@ class _BetPageState extends State<BetPage> {
                                 setState(() {
                                   selectedIndices[index] =
                                       (selectedIndices[index] ?? 0) + 1;
-                                  selectedValues += fichas[index].valor;
+                                  selectedValues += chips[index].valor;
                                   BetController.instance.save(
                                     selectedIndices,
                                     selectedValues,
@@ -207,9 +207,9 @@ Widget PokerCall(
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
             ),
-            itemCount: fichas.length,
+            itemCount: chips.length,
             itemBuilder: (_, index) {
-              final ficha = fichas[index];
+              final ficha = chips[index];
               int count = indices[index] ?? 0;
               return Card(
                 color: count > 0 ? Colors.blue[900] : Colors.grey[700],
@@ -344,9 +344,9 @@ Widget PokerRaise(
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
             ),
-            itemCount: fichas.length,
+            itemCount: chips.length,
             itemBuilder: (_, index) {
-              final ficha = fichas[index];
+              final ficha = chips[index];
               int count = indices[index] ?? 0;
               return Card(
                 color: count > 0 ? Colors.orange[900] : Colors.grey[700],

@@ -66,14 +66,14 @@ flutter:
     - images/carta-avesso.png
     - images/paus.png
     - images/copas.png
-    - images/fichas/black.png
-    - images/fichas/green.png
-    - images/fichas/red.png
-    - images/fichas/yellow.png
-    - images/fichas/brown.png
-    - images/fichas/purple.png
-    - images/fichas/white.png
-    - images/fichas/orange.png
+    - images/chips/black.png
+    - images/chips/green.png
+    - images/chips/red.png
+    - images/chips/yellow.png
+    - images/chips/brown.png
+    - images/chips/purple.png
+    - images/chips/white.png
+    - images/chips/orange.png
 
     
 
