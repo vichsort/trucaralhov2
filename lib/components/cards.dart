@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-const double kCardWidth = 80;
-const double kCardHeight = 120;
+const double kCardWidth = 57;
+const double kCardHeight = 80;
 final BorderRadius kCardRadius = BorderRadius.circular(8);
 
 BoxDecoration _cardBaseDecoration = BoxDecoration(
@@ -49,6 +49,8 @@ Widget buildTableCard(String imageUrl) {
     ),
   );
 }
+
+// Largura: 57 Altura: 80
 
 Widget buildCardFront(
   String imageUrl,

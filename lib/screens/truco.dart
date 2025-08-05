@@ -44,10 +44,17 @@ class _TrucoPageState extends State<TrucoPage> {
     });
 
     // Atualiza lógica
-    game.jogarCartaObjeto(cartaJogada, isJogador1: true);
+    game.throwCard(cartaJogada, isJogador1: true);
 
     // Bot joga
     _opponentPlay();
+  }
+
+  void verifyEmpty() {
+    if (player1Cards.isEmpty && player2Cards.isEmpty) {
+      // Reinicia o jogo
+      startGame();
+    }
   }
 
   Future<void> _opponentPlay() async {
@@ -61,7 +68,8 @@ class _TrucoPageState extends State<TrucoPage> {
       tableCards.add(cartaJogada);
     });
 
-    game.jogarCartaObjeto(cartaJogada, isJogador1: false);
+    game.throwCard(cartaJogada, isJogador1: false);
+    verifyEmpty();
   }
 
   Future<void> startGame() async {

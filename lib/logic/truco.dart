@@ -123,23 +123,10 @@ class TrucoGame {
 
   bool fimDeJogo() => pontosTime1 >= 12 || pontosTime2 >= 12;
 
-  /// Nova API: jogar carta por objeto
-  void jogarCartaObjeto(Carta carta, {required bool isJogador1}) {
+  void throwCard(Carta carta, {required bool isJogador1}) {
     final mao = isJogador1 ? maoJogador1 : maoJogador2;
     final i = mao.indexOf(carta);
-    if (i == -1) {
-      print('Carta não encontrada na mão (${isJogador1 ? "J1" : "J2"}): $carta');
-      return;
-    }
     final cartaJogada = mao.removeAt(i);
-    print("${isJogador1 ? 'Jogador 1' : 'Jogador 2'} jogou: $cartaJogada");
-    _registrarNaMesa(cartaJogada, isJogador1);
-  }
-
-  void jogarCarta(int indiceCarta, bool isJogador1) {
-    final mao = isJogador1 ? maoJogador1 : maoJogador2;
-    if (indiceCarta < 0 || indiceCarta >= mao.length) return;
-    final cartaJogada = mao.removeAt(indiceCarta);
     print("${isJogador1 ? 'Jogador 1' : 'Jogador 2'} jogou: $cartaJogada");
     _registrarNaMesa(cartaJogada, isJogador1);
   }
@@ -165,10 +152,5 @@ class TrucoGame {
       print('Empate na vaza.');
     }
     mesa = [null, null];
-  }
-
-  // Chamado pela UI antiga
-  void onCartaTapped(int index) {
-    jogarCarta(index, true);
   }
 }

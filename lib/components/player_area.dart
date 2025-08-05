@@ -12,15 +12,6 @@ Widget buildPlayer1Area(
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          'Suas Cartas (Jogador 1)',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.blue[800],
-          ),
-        ),
-        const SizedBox(height: 20),
         if (isLoading)
           const CircularProgressIndicator()
         else if (player1Cards.isNotEmpty)
@@ -37,19 +28,8 @@ Widget buildPlayer1Area(
           )
         else
           const Text('Nenhuma carta disponível'),
-        const SizedBox(height: 30),
-        ElevatedButton(
-          onPressed: isLoading ? null : startGame,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green[700],
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          ),
-          child: Text(
-            isLoading ? 'Distribuindo...' : 'Distribuir Novas Cartas',
-            style: const TextStyle(fontSize: 16),
-          ),
-        ),
+          
+      
       ],
     ),
   );
@@ -61,15 +41,6 @@ Widget buildPlayer2Area(List player2Cards, bool isLoading) {
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          'Cartas do Oponente (Jogador 2)',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.blue[800],
-          ),
-        ),
-        const SizedBox(height: 20),
         if (isLoading)
           const CircularProgressIndicator()
         else if (player2Cards.isNotEmpty)
@@ -96,15 +67,6 @@ Widget buildTableCardArea(List tableCards, bool isLoading) {
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          'Cartas na Mesa',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.orange[800],
-          ),
-        ),
-        const SizedBox(height: 20),
         if (isLoading)
           const CircularProgressIndicator()
         else
