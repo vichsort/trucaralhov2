@@ -18,10 +18,10 @@ class _TrucoPageState extends State<TrucoPage> {
   List<Carta> tableCards = [];
 
   /// Cartas do Jogador 1 (você)
-  List<Carta> player1Cards = [];
+  List<Carta> p1Cards = [];
 
   /// Cartas do Jogador 2 (oponente) - guardamos as cartas completas, mas exibimos viradas
-  List<Carta> player2Cards = [];
+  List<Carta> p2Cards = [];
 
   bool isLoading = false;
 
@@ -35,23 +35,23 @@ class _TrucoPageState extends State<TrucoPage> {
   }
 
   void onCardTapped(int index) {
-    if (index < 0 || index >= player1Cards.length) return;
-    final cartaJogada = player1Cards[index];
+    if (index < 0 || index >= p1Cards.length) return;
+    final playedCard = p1Cards[index];
 
     setState(() {
-      tableCards.add(cartaJogada);
-      player1Cards.removeAt(index);
+      tableCards.add(playedCard);
+      p1Cards.removeAt(index);
     });
 
     // Atualiza lógica
-    game.throwCard(cartaJogada, isJogador1: true);
+    game.throwCard(playedCard, isJogador1: true);
 
     // Bot joga
     _opponentPlay();
   }
 
   void verifyEmpty() {
-    if (player1Cards.isEmpty && player2Cards.isEmpty) {
+    if (p1Cards.isEmpty && p2Cards.isEmpty) {
       // Reinicia o jogo
       callCards();
       startGame();
@@ -63,22 +63,22 @@ class _TrucoPageState extends State<TrucoPage> {
     final apiCards = await deckService.drawCards(15);
 
     // Converte para modelo interno (List<Carta>)
-    final cartas = apiCards.map<Carta>((card) => Carta.fromApi(card)).toList();
-    return cartas;
+    final cards = apiCards.map<Carta>((card) => Carta.fromApi(card)).toList();
+    return cards;
   }
 
   Future<void> _opponentPlay() async {
-    if (player2Cards.isEmpty) return;
+    if (p2Cards.isEmpty) return;
 
     await Future.delayed(const Duration(seconds: 1)); // simula pensar
 
-    final cartaJogada = player2Cards.removeAt(0);
+    final playedCard = p2Cards.removeAt(0);
 
     setState(() {
-      tableCards.add(cartaJogada);
+      tableCards.add(playedCard);
     });
 
-    game.throwCard(cartaJogada, isJogador1: false);
+    game.throwCard(playedCard, isJogador1: false);
     verifyEmpty();
   }
 
@@ -89,21 +89,21 @@ class _TrucoPageState extends State<TrucoPage> {
       // Reinicia lógica
       game = TrucoGame();
 
-      final cartas = await callCards();
+      final cards = await callCards();
 
       // Inicializa rodada na lógica
-      game.iniciarRodada(cartas);
+      game.iniciarRodada(cards);
 
       // Sincroniza estado visual
       setState(() {
-        if (cartas.length >= 7) {
-          tableCards = [cartas[0]]; // vira
-          player1Cards = cartas.sublist(1, 4); // 3 cartas
-          player2Cards = cartas.sublist(4, 7); // 3 cartas
+        if (cards.length >= 7) {
+          tableCards = [cards[0]]; // vira
+          p1Cards = cards.sublist(1, 4);
+          p2Cards = cards.sublist(4, 7);
         } else {
           // fallback defensivo
-          player1Cards = cartas.take(3).toList();
-          player2Cards = cartas.skip(3).take(3).toList();
+          p1Cards = cards.take(3).toList();
+          p2Cards = cards.skip(3).take(3).toList();
           tableCards = [];
         }
       });
@@ -114,8 +114,8 @@ class _TrucoPageState extends State<TrucoPage> {
         ).showSnackBar(SnackBar(content: Text('Erro ao carregar cartas: $e')));
       }
       setState(() {
-        player1Cards = [];
-        player2Cards = [];
+        p1Cards = [];
+        p2Cards = [];
         tableCards = [];
       });
     } finally {
@@ -137,9 +137,9 @@ class _TrucoPageState extends State<TrucoPage> {
         ),
         child: ListView(
           children: [
-            buildPlayer2Area(player2Cards, isLoading),
+            buildPlayer2Area(p2Cards, isLoading),
             buildTableCardArea(tableCards, isLoading),
-            buildPlayer1Area(player1Cards, isLoading, onCardTapped, startGame),
+            buildPlayer1Area(p1Cards, isLoading, onCardTapped, startGame),
           ],
         ),
       ),

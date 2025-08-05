@@ -83,7 +83,7 @@ class TrucoGame {
 
   bool isManilha(Carta carta) => manilhas.contains(carta.valor.toUpperCase());
 
-  int compararCartas(Carta c1, Carta c2) {
+  int compareCards(Carta c1, Carta c2) {
     final manilha1 = isManilha(c1);
     final manilha2 = isManilha(c2);
 
@@ -98,49 +98,49 @@ class TrucoGame {
     }
   }
 
-  void pedirTruco() {
-    if (valorRodada == 1) {
-      valorRodada = 3;
-    } else if (valorRodada == 3) {
-      valorRodada = 6;
-    } else if (valorRodada == 6) {
-      valorRodada = 9;
-    }
-  }
+  // void pedirTruco() {
+  //   if (valorRodada == 1) {
+  //     valorRodada = 3;
+  //   } else if (valorRodada == 3) {
+  //     valorRodada = 6;
+  //   } else if (valorRodada == 6) {
+  //     valorRodada = 9;
+  //   }
+  // }
 
-  void aceitarTruco() {
-    /* mantém valor */
-  }
+  // void aceitarTruco() {
+  //   /* mantém valor */
+  // }
 
-  void correr(bool jogador1Correu) {
-    if (jogador1Correu) {
-      pontosTime2 += valorRodada;
-    } else {
-      pontosTime1 += valorRodada;
-    }
-  }
+  // void correr(bool jogador1Correu) {
+  //   if (jogador1Correu) {
+  //     pontosTime2 += valorRodada;
+  //   } else {
+  //     pontosTime1 += valorRodada;
+  //   }
+  // }
 
-  bool fimDeJogo() => pontosTime1 >= 12 || pontosTime2 >= 12;
+  bool gameOver() => pontosTime1 >= 12 || pontosTime2 >= 12;
 
   void throwCard(Carta carta, {required bool isJogador1}) {
     final mao = isJogador1 ? maoJogador1 : maoJogador2;
     final i = mao.indexOf(carta);
-    final cartaJogada = mao.removeAt(i);
-    print("${isJogador1 ? 'Jogador 1' : 'Jogador 2'} jogou: $cartaJogada");
-    _registrarNaMesa(cartaJogada, isJogador1);
+    final playedCard = mao.removeAt(i);
+    print("${isJogador1 ? 'Jogador 1' : 'Jogador 2'} jogou: $playedCard");
+    registerInTable(playedCard, isJogador1);
   }
 
-  void _registrarNaMesa(Carta carta, bool isJogador1) {
+  void registerInTable(Carta carta, bool isJogador1) {
     mesa[isJogador1 ? 0 : 1] = carta;
     if (mesa[0] != null && mesa[1] != null) {
-      _resolverVaza();
+      resolveWin();
     }
   }
 
-  void _resolverVaza() {
+  void resolveWin() {
     final c1 = mesa[0]!;
     final c2 = mesa[1]!;
-    final resultado = compararCartas(c1, c2);
+    final resultado = compareCards(c1, c2);
     if (resultado > 0) {
       pontosTime1 += valorRodada;
       print('J1 Ganhou (+$valorRodada).');

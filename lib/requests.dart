@@ -14,7 +14,7 @@ class DeckService {
       final data = jsonDecode(response.body);
       deckId = data['deck_id'];
     } else {
-      throw Exception('Falha ao carregar novo deck (API)');
+      throw Exception('Falha ao carregar novo deck (API vazia ou erro HTTP)');
     }
   }
 
@@ -31,7 +31,6 @@ class DeckService {
     if (response.statusCode == 200 && response.body.isNotEmpty) {
       final data = jsonDecode(response.body);
 
-      // ⚠️ Verifica se o baralho não tem cartas suficientes
       if (data['success'] == false || data['cards'] == null) {
         await getNewDeck();
         return drawCards(count);
@@ -63,7 +62,7 @@ class DeckService {
           )
           .toList();
     } else {
-      throw Exception('Falha ao carregar cartas (API)');
+      throw Exception('Falha ao carregar cartas (API vazia ou erro HTTP)');
     }
   }
 }
