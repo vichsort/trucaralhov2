@@ -2,7 +2,7 @@
     package="com.example.truco">
     
     <application
-        android:label="Truco Counter"
+        android:label="Trucaralho"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         
