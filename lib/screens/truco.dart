@@ -129,16 +129,20 @@ class _TrucoPageState extends State<TrucoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("images/fundo.jpg"),
+            image: AssetImage('images/fundo.jpg'),
             fit: BoxFit.cover,
           ),
         ),
-        child: ListView(
+        child: Column(
           children: [
             buildPlayer2Area(p2Cards, isLoading),
+            const Spacer(),
             buildTableCardArea(tableCards, isLoading),
+            const Spacer(),
             buildPlayer1Area(p1Cards, isLoading, onCardTapped, startGame),
           ],
         ),

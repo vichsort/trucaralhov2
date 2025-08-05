@@ -19,8 +19,10 @@ class HomePage extends StatelessWidget {
           ),
         ),
         child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Wrap(
+            spacing: 20,
+            runSpacing: 20,
+            alignment: WrapAlignment.center,
             children: [
               GameCard(
                 label: 'Jogos',
@@ -29,7 +31,6 @@ class HomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => TrucoPage()),
                 ),
               ),
-              const SizedBox(width: 20),
               GameCard(
                 label: 'Contador de truco',
                 onTap: () => Navigator.push(
@@ -37,7 +38,6 @@ class HomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => CounterTrucoPage()),
                 ),
               ),
-              const SizedBox(width: 20),
               GameCard(
                 label: 'BlackJack',
                 onTap: () => Navigator.push(
@@ -45,7 +45,6 @@ class HomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => BlackJackPage()),
                 ),
               ),
-              const SizedBox(width: 20),
               GameCard(
                 label: 'Poker',
                 onTap: () => Navigator.push(
@@ -53,7 +52,6 @@ class HomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => PokerPage()),
                 ),
               ),
-              const SizedBox(width: 20),
               GameCard(
                 label: 'Fodinha',
                 onTap: () => Navigator.push(
