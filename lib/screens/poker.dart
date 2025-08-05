@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import '../components/player_area.dart';
 import '../logic/bet.dart';
 import '../logic/fichas.dart';
 import '../logic/historico.dart';
-import '../logic/CounterPlayer.dart';
 import '../logic/howTo.dart';
 
 class PokerPage extends StatefulWidget {

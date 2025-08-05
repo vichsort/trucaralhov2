@@ -64,6 +64,18 @@ flutter:
   assets:
     - images/fundo.jpg
     - images/carta-avesso.png
+    - images/paus.png
+    - images/copas.png
+    - images/fichas/black.png
+    - images/fichas/green.png
+    - images/fichas/red.png
+    - images/fichas/yellow.png
+    - images/fichas/brown.png
+    - images/fichas/purple.png
+    - images/fichas/white.png
+    - images/fichas/orange.png
+
+    
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

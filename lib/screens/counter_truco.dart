@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../logic/historico.dart';
-import '../logic/counterPlayer.dart';
+import '../components/player_area.dart';
 import '../logic/howTo.dart';
 
 class CounterTrucoPage extends StatefulWidget {

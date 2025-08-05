@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../logic/bet.dart';
 import '../logic/historico.dart';
-import '../logic/CounterPlayer.dart';
+import '../components/player_area.dart';
 import '../logic/howTo.dart';
 
 class BlackJackPage extends StatefulWidget {

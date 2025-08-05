@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './home_play_truco.dart';
+import './truco.dart';
 import './counter_truco.dart';
 import './blackjack.dart';
 import './poker.dart';
@@ -26,7 +26,7 @@ class HomePage extends StatelessWidget {
                 label: 'Jogos',
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HomePlayPage()),
+                  MaterialPageRoute(builder: (context) => TrucoPage()),
                 ),
               ),
               const SizedBox(width: 20),
