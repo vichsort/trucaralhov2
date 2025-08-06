@@ -42,7 +42,11 @@ Widget buildPlayer1Area(
   );
 }
 
-Widget buildPlayer2Area(List player2Cards, bool isLoading) {
+Widget buildPlayer2Area(
+  List player2Cards,
+  bool isLoading,
+  List<GlobalKey> keys,
+) {
   return Container(
     padding: const EdgeInsets.all(16),
     child: Column(
@@ -53,13 +57,14 @@ Widget buildPlayer2Area(List player2Cards, bool isLoading) {
         else if (player2Cards.isNotEmpty)
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: player2Cards.map((_) {
-              // carta virada
+            children: List.generate(player2Cards.length, (index) {
+              final key = keys[index];
+
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: buildCardBack(),
+                child: Container(key: key, child: buildCardBack()),
               );
-            }).toList(),
+            }),
           )
         else
           const Text('Nenhuma carta disponível'),
@@ -185,7 +190,7 @@ Widget trucoPlayer(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                       ),
-                    child: Text('CORRER'),
+                      child: Text('CORRER'),
                     ),
                     SizedBox(width: 20),
                     ElevatedButton(

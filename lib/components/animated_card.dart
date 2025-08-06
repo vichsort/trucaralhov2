@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import '../logic/truco.dart';
 
 class AnimatedCard extends StatefulWidget {
@@ -17,9 +18,11 @@ class AnimatedCard extends StatefulWidget {
   State<AnimatedCard> createState() => _AnimatedCardState();
 }
 
-class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderStateMixin {
+class _AnimatedCardState extends State<AnimatedCard>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<Offset> _animation;
+  late final Animation<Offset> _positionAnimation;
+  late final Animation<double> _flipAnimation;
 
   @override
   void initState() {
@@ -27,12 +30,17 @@ class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderSt
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 700),
     );
 
-    _animation = Tween<Offset>(
+    _positionAnimation = Tween<Offset>(
       begin: widget.start,
       end: widget.end,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    _flipAnimation = Tween<double>(
+      begin: 0,
+      end: pi,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     _controller.forward();
@@ -44,17 +52,24 @@ class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderSt
     super.dispose();
   }
 
+  bool get isFront => _flipAnimation.value > pi / 2;
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, child) {
+      animation: _controller,
+      builder: (_, child) {
         return Positioned(
-          left: _animation.value.dx,
-          top: _animation.value.dy,
-          child: Image.network(
-            widget.card.imageUrl,
-            width: 60,
+          left: _positionAnimation.value.dx,
+          top: _positionAnimation.value.dy,
+          child: Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.001)
+              ..rotateY(_flipAnimation.value),
+            child: isFront
+                ? Image.network(widget.card.imageUrl, width: 60)
+                : Image.asset('images/carta-avesso.png', width: 60),
           ),
         );
       },

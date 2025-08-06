@@ -29,7 +29,8 @@ class _TrucoPageState extends State<TrucoPage> {
   Carta? animatingCard;
   Offset cardStart = Offset.zero;
   Offset cardEnd = Offset.zero;
-  List<GlobalKey> cardKeys = [];
+  List<GlobalKey> p1CardKeys = [];
+  List<GlobalKey> p2CardKeys = [];
 
   /// Serviço remoto
   final DeckService deckService = DeckService();
@@ -44,7 +45,7 @@ class _TrucoPageState extends State<TrucoPage> {
     if (index < 0 || index >= p1Cards.length) return;
 
     final playedCard = p1Cards[index];
-    final key = cardKeys[index];
+    final key = p1CardKeys[index];
 
     final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
@@ -67,7 +68,7 @@ class _TrucoPageState extends State<TrucoPage> {
 
     setState(() {
       p1Cards.removeAt(index);
-      cardKeys.removeAt(index);
+      p1CardKeys.removeAt(index);
       tableCards.add(playedCard);
       animatingCard = null;
     });
@@ -99,10 +100,33 @@ class _TrucoPageState extends State<TrucoPage> {
 
     await Future.delayed(const Duration(seconds: 1)); // simula pensar
 
-    final playedCard = p2Cards.removeAt(0);
+    final playedCard = p2Cards[0];
+    final key = p2CardKeys[0];
+
+    final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+
+    final startOffset = renderBox.localToGlobal(Offset.zero);
+
+    final screenSize = MediaQuery.of(context).size;
+    final endOffset = Offset(
+      screenSize.width / 2 - 30,
+      screenSize.height / 2 - 50,
+    );
+
+    setState(() {
+      animatingCard = playedCard;
+      cardStart = startOffset;
+      cardEnd = endOffset;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 700));
 
     setState(() {
       tableCards.add(playedCard);
+      p2Cards.removeAt(0);
+      p2CardKeys.removeAt(0);
+      animatingCard = null;
     });
 
     game.throwCard(playedCard, isJogador1: false);
@@ -132,7 +156,8 @@ class _TrucoPageState extends State<TrucoPage> {
           p2Cards = cards.skip(3).take(3).toList();
           tableCards = [];
         }
-        cardKeys = List.generate(p1Cards.length, (_) => GlobalKey());
+        p1CardKeys = List.generate(p1Cards.length, (_) => GlobalKey());
+        p2CardKeys = List.generate(p2Cards.length, (_) => GlobalKey());
       });
     } catch (e) {
       if (mounted) {
@@ -174,7 +199,7 @@ class _TrucoPageState extends State<TrucoPage> {
             ),
             child: Column(
               children: [
-                buildPlayer2Area(p2Cards, isLoading),
+                buildPlayer2Area(p2Cards, isLoading, p2CardKeys),
                 const Spacer(),
                 buildTableCardArea(tableCards, isLoading),
                 const Spacer(),
@@ -183,7 +208,7 @@ class _TrucoPageState extends State<TrucoPage> {
                   isLoading,
                   onCardTapped,
                   startGame,
-                  cardKeys,
+                  p1CardKeys,
                 ),
               ],
             ),
