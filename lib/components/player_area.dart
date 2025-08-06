@@ -92,23 +92,23 @@ Widget buildTableCardArea(List tableCards, bool isLoading) {
 }
 
 Widget trucoPlayer(
-  void Function(String) _increment,
-  void Function(String) _decrease,
-  void Function(String) _resetSide,
+  void Function(String) increment,
+  void Function(String) decrease,
+  void Function(String) resetSide,
   String side,
   int count,
   int wins,
   bool detect,
   bool hide,
-  void Function(String, bool) _changeUp,
+  void Function(String, bool) changeUp,
   String words,
-  void Function(String) _correr,
+  void Function(String) correr,
 ) {
   return Expanded(
     child: GestureDetector(
-      onTap: () => _increment(side),
-      onDoubleTap: () => _decrease(side),
-      onLongPress: () => _resetSide(side),
+      onTap: () => increment(side),
+      onDoubleTap: () => decrease(side),
+      onLongPress: () => resetSide(side),
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -130,7 +130,7 @@ Widget trucoPlayer(
                 ),
               ),
               Text(
-                '${side == "left" ? "Nós" : "Eles"}',
+                side == "left" ? "Nós" : "Eles",
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -140,7 +140,7 @@ Widget trucoPlayer(
               const SizedBox(height: 8),
               Image(
                 image: AssetImage(
-                  '${side == "left" ? "images/paus.png" : "images/copas.png"}',
+                  side == "left" ? "images/paus.png" : "images/copas.png",
                 ),
                 height: 150,
                 width: 150,
@@ -169,7 +169,7 @@ Widget trucoPlayer(
                     ),
                   ),
                   onPressed: () {
-                    _changeUp(side, true);
+                    changeUp(side, true);
                   },
                   child: Text(words),
                 ),
@@ -180,22 +180,22 @@ Widget trucoPlayer(
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        _correr(side);
+                        correr(side);
                       },
-                      child: Text('CORRER'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                       ),
+                    child: Text('CORRER'),
                     ),
                     SizedBox(width: 20),
                     ElevatedButton(
                       onPressed: () {
-                        _changeUp(side, false);
+                        changeUp(side, false);
                       },
-                      child: Text('ACEITAR'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                       ),
+                      child: Text('ACEITAR'),
                     ),
                   ],
                 ),
@@ -208,18 +208,18 @@ Widget trucoPlayer(
 }
 
 Widget blackJackPlayer(
-  void Function(String) _increment,
-  void Function(String) _decrease,
+  void Function(String) increment,
+  void Function(String) decrease,
   String side,
   int count,
   int wins,
   bool aceDetect,
-  void Function(String, bool) _aceVal,
+  void Function(String, bool) aceVal,
 ) {
   return Expanded(
     child: GestureDetector(
-      onTap: () => _increment(side),
-      onLongPress: () => _decrease(side),
+      onTap: () => increment(side),
+      onLongPress: () => decrease(side),
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -241,7 +241,7 @@ Widget blackJackPlayer(
                 ),
               ),
               Text(
-                "${side == "left" ? "Convidado" : "Dealer"}",
+                side == "left" ? "Convidado" : "Dealer",
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -271,22 +271,22 @@ Widget blackJackPlayer(
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        _aceVal(side, false);
+                        aceVal(side, false);
                       },
-                      child: Text('ACEITAR 1'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                       ),
+                      child: Text('ACEITAR 1'),
                     ),
                     SizedBox(width: 20),
                     ElevatedButton(
                       onPressed: () {
-                        _aceVal(side, true);
+                        aceVal(side, true);
                       },
-                      child: Text('ACEITAR 11'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                       ),
+                      child: Text('ACEITAR 11'),
                     ),
                   ],
                 ),
@@ -300,13 +300,13 @@ Widget blackJackPlayer(
 
 Widget pokerPlayer(
   BuildContext context,
-  void Function(BuildContext, String) _modalCall,
-  void Function(String) _check,
-  void Function(BuildContext, String) _modalRaise,
-  void Function(String) _confirmFold,
+  void Function(BuildContext, String) modalCall,
+  void Function(String) check,
+  void Function(BuildContext, String) modalRaise,
+  void Function(String) confirmFold,
   void Function(String) allInConfirm,
-  void Function(String) _accept,
-  void Function(String) _win,
+  void Function(String) accept,
+  void Function(String) win,
   String id,
   int inTable,
   int value,
@@ -329,7 +329,7 @@ Widget pokerPlayer(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          '\$${value}',
+          '\$$value',
           style: const TextStyle(
             fontSize: 48,
             fontWeight: FontWeight.bold,
@@ -339,7 +339,7 @@ Widget pokerPlayer(
         const SizedBox(height: 8),
 
         Text(
-          "${id == "left" ? "Convidado" : "Casa"}",
+          id == "left" ? "Convidado" : "Casa",
           style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -349,7 +349,7 @@ Widget pokerPlayer(
         const SizedBox(height: 3),
         Image(
           image: AssetImage(
-            "${id == "left" ? "images/paus.png" : "images/copas.png"}",
+            id == "left" ? "images/paus.png" : "images/copas.png",
           ),
           height: 150,
           width: 150,
@@ -371,7 +371,7 @@ Widget pokerPlayer(
               borderRadius: BorderRadius.circular(15),
             ),
             child: Text(
-              'Na mesa: \$${inTable}',
+              'Na mesa: \$$inTable',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
@@ -387,7 +387,7 @@ Widget pokerPlayer(
                   Expanded(
                     child: ElevatedButton(
                       onPressed: gamePhase == 'betting'
-                          ? () => _modalCall(context, id)
+                          ? () => modalCall(context, id)
                           : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
@@ -409,7 +409,7 @@ Widget pokerPlayer(
                           gamePhase != 'showdown' &&
                               gamePhase != 'all_in' &&
                               gamePhase != 'betting'
-                          ? () => _check(id)
+                          ? () => check(id)
                           : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
@@ -434,7 +434,7 @@ Widget pokerPlayer(
                     child: ElevatedButton(
                       onPressed:
                           (gamePhase == 'betting' || gamePhase == 'called')
-                          ? () => _modalRaise(context, id)
+                          ? () => modalRaise(context, id)
                           : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
@@ -454,7 +454,7 @@ Widget pokerPlayer(
                     child: ElevatedButton(
                       onPressed:
                           gamePhase != 'betting' && gamePhase != 'showdown'
-                          ? () => _confirmFold(id)
+                          ? () => confirmFold(id)
                           : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
@@ -496,7 +496,7 @@ Widget pokerPlayer(
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => _accept(id),
+                      onPressed: () => accept(id),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.teal,
                         padding: EdgeInsets.symmetric(vertical: 12),
@@ -523,7 +523,7 @@ Widget pokerPlayer(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () => _win(id),
+                  onPressed: () => win(id),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber,
                   ),
