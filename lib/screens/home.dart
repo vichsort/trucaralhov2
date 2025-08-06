@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
-import './truco.dart';
-import './counter_truco.dart';
-import './blackjack.dart';
-import './poker.dart';
-import './fodinha.dart';
+import 'truco.dart';
+import './counting games/home.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key, required});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  Widget _buildGameButton(String text, VoidCallback onPressed) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: ElevatedButton(onPressed: onPressed, child: Text(text)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,83 +23,103 @@ class HomePage extends StatelessWidget {
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('images/fundo.jpg'),
+            image: AssetImage('images/fundo.jpgy'),
             fit: BoxFit.cover,
           ),
         ),
-        child: Center(
-          child: Wrap(
-            spacing: 20,
-            runSpacing: 20,
-            alignment: WrapAlignment.center,
-            children: [
-              GameCard(
-                label: 'Jogos',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TrucoPage()),
-                ),
-              ),
-              GameCard(
-                label: 'Contador de truco',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CounterTrucoPage()),
-                ),
-              ),
-              GameCard(
-                label: 'BlackJack',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => BlackJackPage()),
-                ),
-              ),
-              GameCard(
-                label: 'Poker',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PokerPage()),
-                ),
-              ),
-              GameCard(
-                label: 'Fodinha',
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => FodinhaPage()),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  // Título do jogo
+                  const Text(
+                    'Trucaralho',
+                    style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 10.0,
+                          color: Colors.black54,
+                          offset: Offset(2.0, 2.0),
+                        ),
+                      ],
+                    ),
+                  ),
 
-class GameCard extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
+                  const SizedBox(height: 30),
 
-  const GameCard({super.key, required this.label, required this.onTap});
+                  // Logo do jogo
+                  Container(
+                    width: 250,
+                    height: 250,
+                    decoration: BoxDecoration(
+                      image: const DecorationImage(
+                        image: AssetImage('assets/logo.png'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset('images/carta-avesso.png', width: 100, height: 150),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              shadows: [Shadow(color: Colors.black, blurRadius: 4)],
+                  const SizedBox(height: 40),
+
+                  // Botões do menu
+                  Column(
+                    children: [
+                      _buildGameButton(
+                        'Jogar de 2',
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => TrucoPage()),
+                        ),
+                      ),
+                      _buildGameButton(
+                        'Jogar de 4',
+                        () => ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Modo Jogar de 4 ainda não implementado.',
+                            ),
+                          ),
+                        ),
+                      ),
+                      _buildGameButton(
+                        'Outros Jogos',
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CounterHomePage(),
+                          ),
+                        ),
+                      ),
+                      _buildGameButton(
+                        'Configurações',
+                        () => ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Config não implementado.'),
+                          ),
+                        ),
+                      ),
+                      _buildGameButton(
+                        'Histórico',
+                        () => ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Histórico ainda não implementado.'),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }

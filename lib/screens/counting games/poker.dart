@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../components/player_area.dart';
-import '../logic/bet.dart';
-import '../logic/chip.dart';
-import '../logic/historico.dart';
-import '../logic/howTo.dart';
+import '../../components/player_area.dart';
+import '../../logic/bet.dart';
+import '../../logic/chip.dart';
+import '../../logic/historico.dart';
+import '../../logic/howTo.dart';
 
 class PokerPage extends StatefulWidget {
   const PokerPage({Key? key}) : super(key: key);

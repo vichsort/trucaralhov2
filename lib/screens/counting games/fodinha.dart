@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../logic/historico.dart';
-import '../logic/howTo.dart';
+import '../../logic/historico.dart';
+import '../../logic/howTo.dart';
 
 class FodinhaPage extends StatefulWidget {
   const FodinhaPage({Key? key}) : super(key: key);

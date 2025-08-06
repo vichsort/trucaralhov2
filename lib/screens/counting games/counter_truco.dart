@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../logic/historico.dart';
-import '../components/player_area.dart';
-import '../logic/howTo.dart';
+import '../../logic/historico.dart';
+import '../../components/player_area.dart';
+import '../../logic/howTo.dart';
 
 class CounterTrucoPage extends StatefulWidget {
   const CounterTrucoPage({Key? key}) : super(key: key);
