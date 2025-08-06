@@ -59,7 +59,6 @@ Widget buildCardFront(
 ) {
   return GestureDetector(
     onTap: () {
-      debugPrint('Carta clicada: $imageUrl');
       onCartaTapped(index);
     },
     child: Container(

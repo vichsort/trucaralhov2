@@ -126,7 +126,6 @@ class TrucoGame {
     final mao = isJogador1 ? maoJogador1 : maoJogador2;
     final i = mao.indexOf(carta);
     final playedCard = mao.removeAt(i);
-    print("${isJogador1 ? 'Jogador 1' : 'Jogador 2'} jogou: $playedCard");
     registerInTable(playedCard, isJogador1);
   }
 
