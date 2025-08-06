@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../logic/truco.dart';
 import '../components/player_area.dart';
+import '../components/animated_card.dart';
 import '../requests.dart';
 
 class TrucoPage extends StatefulWidget {
@@ -25,6 +26,11 @@ class _TrucoPageState extends State<TrucoPage> {
 
   bool isLoading = false;
 
+  Carta? animatingCard;
+  Offset cardStart = Offset.zero;
+  Offset cardEnd = Offset.zero;
+  List<GlobalKey> cardKeys = [];
+
   /// Serviço remoto
   final DeckService deckService = DeckService();
 
@@ -34,20 +40,41 @@ class _TrucoPageState extends State<TrucoPage> {
     startGame();
   }
 
-  void onCardTapped(int index) {
+  void onCardTapped(int index) async {
     if (index < 0 || index >= p1Cards.length) return;
+
     final playedCard = p1Cards[index];
+    final key = cardKeys[index];
+
+    final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+
+    final startOffset = renderBox.localToGlobal(Offset.zero);
+
+    final screenSize = MediaQuery.of(context).size;
+    final endOffset = Offset(
+      screenSize.width / 2 - 30,
+      screenSize.height / 2 - 50,
+    ); // centralize
 
     setState(() {
-      tableCards.add(playedCard);
-      p1Cards.removeAt(index);
+      animatingCard = playedCard;
+      cardStart = startOffset;
+      cardEnd = endOffset;
     });
 
-    // Atualiza lógica
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    setState(() {
+      p1Cards.removeAt(index);
+      cardKeys.removeAt(index);
+      tableCards.add(playedCard);
+      animatingCard = null;
+    });
+
     game.throwCard(playedCard, isJogador1: true);
 
-    // Bot joga
-    _opponentPlay();
+    await _opponentPlay();
   }
 
   void verifyEmpty() {
@@ -92,20 +119,20 @@ class _TrucoPageState extends State<TrucoPage> {
       final cards = await callCards();
 
       // Inicializa rodada na lógica
-      game.iniciarRodada(cards);
+      game.startRound(cards);
 
       // Sincroniza estado visual
       setState(() {
         if (cards.length >= 7) {
-          tableCards = [cards[0]]; // vira
+          tableCards = [cards[0]];
           p1Cards = cards.sublist(1, 4);
           p2Cards = cards.sublist(4, 7);
         } else {
-          // fallback defensivo
           p1Cards = cards.take(3).toList();
           p2Cards = cards.skip(3).take(3).toList();
           tableCards = [];
         }
+        cardKeys = List.generate(p1Cards.length, (_) => GlobalKey());
       });
     } catch (e) {
       if (mounted) {
@@ -128,24 +155,44 @@ class _TrucoPageState extends State<TrucoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('images/fundo.jpg'),
-            fit: BoxFit.cover,
+      appBar: AppBar(
+        title: const Text('Truco'),
+        actions: [
+          IconButton(icon: const Icon(Icons.refresh), onPressed: startGame),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('images/fundo.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Column(
+              children: [
+                buildPlayer2Area(p2Cards, isLoading),
+                const Spacer(),
+                buildTableCardArea(tableCards, isLoading),
+                const Spacer(),
+                buildPlayer1Area(
+                  p1Cards,
+                  isLoading,
+                  onCardTapped,
+                  startGame,
+                  cardKeys,
+                ),
+              ],
+            ),
           ),
-        ),
-        child: Column(
-          children: [
-            buildPlayer2Area(p2Cards, isLoading),
-            const Spacer(),
-            buildTableCardArea(tableCards, isLoading),
-            const Spacer(),
-            buildPlayer1Area(p1Cards, isLoading, onCardTapped, startGame),
-          ],
-        ),
+
+          // Carta sendo animada
+          if (animatingCard != null)
+            AnimatedCard(card: animatingCard!, start: cardStart, end: cardEnd),
+        ],
       ),
     );
   }

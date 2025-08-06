@@ -63,7 +63,7 @@ class TrucoGame {
   // Aqui ocorre o armazenamento por matriz: [Jogador 1, Jogado 2]
   List<Carta?> mesa = [null, null];
 
-  void iniciarRodada(List<Carta> cartasDistribuidas) {
+  void startRound(List<Carta> cartasDistribuidas) {
     if (cartasDistribuidas.length < 7) {
       throw Exception("Cartas insuficientes");
     }

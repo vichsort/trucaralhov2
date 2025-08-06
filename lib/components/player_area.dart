@@ -4,8 +4,9 @@ import './cards.dart';
 Widget buildPlayer1Area(
   List player1Cards,
   bool isLoading,
-  void Function(int) onCartaTapped,
+  void Function(int) onCardTapped,
   VoidCallback startGame,
+  List<GlobalKey> keys,
 ) {
   return Container(
     padding: const EdgeInsets.all(16),
@@ -20,16 +21,22 @@ Widget buildPlayer1Area(
             children: player1Cards.asMap().entries.map((entry) {
               final index = entry.key;
               final carta = entry.value;
+              final key = keys[index];
+
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: buildCardFront(carta.imageUrl, index, onCartaTapped),
+                child: GestureDetector(
+                  onTap: () => onCardTapped(index),
+                  child: Container(
+                    key: key,
+                    child: buildCardFront(carta.imageUrl, index, onCardTapped),
+                  ),
+                ),
               );
             }).toList(),
           )
         else
           const Text('Nenhuma carta disponível'),
-          
-      
       ],
     ),
   );
@@ -244,9 +251,7 @@ Widget blackJackPlayer(
               const SizedBox(height: 8),
               Image(
                 image: AssetImage(
-                  side == "left"
-                      ? "images/paus.png"
-                      : "images/copas.png",
+                  side == "left" ? "images/paus.png" : "images/copas.png",
                 ),
                 height: 150,
                 width: 150,
