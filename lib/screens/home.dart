@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vibration/vibration.dart';
 import 'truco.dart';
 import './counting games/home.dart';
 
@@ -13,8 +14,21 @@ class _HomePageState extends State<HomePage> {
   Widget _buildGameButton(String text, VoidCallback onPressed) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ElevatedButton(onPressed: onPressed, child: Text(text)),
+      child: ElevatedButton(
+        onPressed: () async {
+          await _vibrate();
+          onPressed();
+        },
+        child: Text(text),
+      ),
     );
+  }
+
+  Future<void> _vibrate() async {
+    bool? hasVibrator = await Vibration.hasVibrator();
+    if (hasVibrator == true) {
+      Vibration.vibrate(duration: 50);
+    }
   }
 
   @override
@@ -58,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                     height: 250,
                     decoration: BoxDecoration(
                       image: const DecorationImage(
-                        image: AssetImage('assets/logo.png'),
+                        image: AssetImage('images/logo.png'),
                         fit: BoxFit.cover,
                       ),
                     ),
