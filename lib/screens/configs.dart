@@ -63,7 +63,7 @@ class _ConfigPageState extends State<ConfigPage> {
                           setState(() {
                             light0 = value;
                           });
-                          if (light0) {
+                          if (value && light1) {
                             _vibrate();
                           }
                         },
@@ -78,7 +78,7 @@ class _ConfigPageState extends State<ConfigPage> {
                           setState(() {
                             light1 = value;
                           });
-                          if (light1) {
+                          if (value) {
                             _vibrate();
                           }
                         },
