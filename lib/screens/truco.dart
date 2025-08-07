@@ -31,6 +31,7 @@ class _TrucoPageState extends State<TrucoPage> {
   Offset cardEnd = Offset.zero;
   List<GlobalKey> p1CardKeys = [];
   List<GlobalKey> p2CardKeys = [];
+  bool get isMyTurn => game.vez == Player.p1;
 
   /// Serviço remoto
   final DeckService deckService = DeckService();
@@ -42,6 +43,7 @@ class _TrucoPageState extends State<TrucoPage> {
   }
 
   void onCardTapped(int index) async {
+    if (!isMyTurn) return; // bloqueia se não for sua vez
     if (index < 0 || index >= p1Cards.length) return;
 
     final playedCard = p1Cards[index];
@@ -51,12 +53,11 @@ class _TrucoPageState extends State<TrucoPage> {
     if (renderBox == null) return;
 
     final startOffset = renderBox.localToGlobal(Offset.zero);
-
     final screenSize = MediaQuery.of(context).size;
     final endOffset = Offset(
       screenSize.width / 2 - 30,
       screenSize.height / 2 - 50,
-    ); // centralize
+    );
 
     setState(() {
       animatingCard = playedCard;
@@ -74,8 +75,16 @@ class _TrucoPageState extends State<TrucoPage> {
     });
 
     game.throwCard(playedCard, isJogador1: true);
+    await Future.delayed(const Duration(milliseconds: 500));
+    nextTurn();
+    verifyEmpty();
+  }
 
-    await _opponentPlay();
+  void nextTurn() async {
+    while (!isMyTurn) {
+      await _opponentPlay();
+      await Future.delayed(const Duration(milliseconds: 300));
+    }
   }
 
   void verifyEmpty() {
@@ -96,37 +105,14 @@ class _TrucoPageState extends State<TrucoPage> {
   }
 
   Future<void> _opponentPlay() async {
-    if (p2Cards.isEmpty) return;
+    if (p2Cards.isEmpty || game.vez != Player.p2) return;
 
     await Future.delayed(const Duration(seconds: 1)); // simula pensar
 
-    final playedCard = p2Cards[0];
-    final key = p2CardKeys[0];
-
-    final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox == null) return;
-
-    final startOffset = renderBox.localToGlobal(Offset.zero);
-
-    final screenSize = MediaQuery.of(context).size;
-    final endOffset = Offset(
-      screenSize.width / 2 - 30,
-      screenSize.height / 2 - 50,
-    );
-
-    setState(() {
-      animatingCard = playedCard;
-      cardStart = startOffset;
-      cardEnd = endOffset;
-    });
-
-    await Future.delayed(const Duration(milliseconds: 700));
+    final playedCard = p2Cards.removeAt(0);
 
     setState(() {
       tableCards.add(playedCard);
-      p2Cards.removeAt(0);
-      p2CardKeys.removeAt(0);
-      animatingCard = null;
     });
 
     game.throwCard(playedCard, isJogador1: false);

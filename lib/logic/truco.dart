@@ -1,5 +1,7 @@
 enum Naipe { hearts, spades, clubs, diamonds }
 
+enum Player { p1, p2 }
+
 Naipe parseSuit(String suit) {
   switch (suit.toUpperCase()) {
     case 'HEARTS':
@@ -59,6 +61,8 @@ class TrucoGame {
   int pontosTime1 = 0;
   int pontosTime2 = 0;
   int valorRodada = 1;
+  Player vez = Player.p1;
+  Player vaza = Player.p1;
 
   // Aqui ocorre o armazenamento por matriz: [Jogador 1, Jogado 2]
   List<Carta?> mesa = [null, null];
@@ -131,8 +135,32 @@ class TrucoGame {
 
   void registerInTable(Carta carta, bool isJogador1) {
     mesa[isJogador1 ? 0 : 1] = carta;
-    if (mesa[0] != null && mesa[1] != null) {
-      resolveWin();
+
+    final jogadaCompleta = mesa[0] != null && mesa[1] != null;
+
+    if (jogadaCompleta) {
+      final resultado = compareCards(mesa[0]!, mesa[1]!);
+
+      if (resultado > 0) {
+        pontosTime1 += valorRodada;
+        vez = Player.p1;
+        print('J1 Ganhou (+$valorRodada).');
+      } else if (resultado < 0) {
+        pontosTime2 += valorRodada;
+        print('J2 Ganhou (+$valorRodada).');
+        vez = Player.p2;
+      } else {
+        // se empatar é o cara de antes..
+        vez = vaza;
+        print('Empate na vaza.');
+      }
+
+      vaza = vez;
+      print(vez);
+      mesa = [null, null];
+    } else {
+      // Depois do primeiro jogar, é a vez do outro
+      vez = isJogador1 ? Player.p2 : Player.p1;
     }
   }
 
