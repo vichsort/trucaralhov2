@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import './counter_truco.dart';
-import 'blackjack.dart';
-import 'poker.dart';
-import './fodinha.dart';
+import 'package:trucaralho/screens/counting games/counter_truco.dart';
+import 'package:trucaralho/screens/counting games/blackjack.dart';
+import 'package:trucaralho/screens/counting games/poker.dart';
+import 'package:trucaralho/screens/counting games/fodinha.dart';
 
 class CounterHomePage extends StatelessWidget {
   const CounterHomePage({super.key});

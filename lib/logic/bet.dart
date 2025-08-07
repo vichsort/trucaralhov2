@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'chip.dart';
+import 'package:trucaralho/logic/chip.dart';
 
 class BetPage extends StatefulWidget {
-  const BetPage({Key? key}) : super(key: key);
+  const BetPage({super.key});
 
   @override
   _BetPageState createState() => _BetPageState();
@@ -171,7 +171,7 @@ class _BetPageState extends State<BetPage> {
   }
 }
 
-Widget PokerCall(
+Widget pokerCall(
   void Function(int) handleCall,
   String side,
   int leftValue,

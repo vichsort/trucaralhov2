@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../logic/historico.dart';
-import '../../logic/howTo.dart';
+import 'package:trucaralho/logic/historico.dart';
+import 'package:trucaralho/logic/how_to.dart';
 
 class FodinhaPage extends StatefulWidget {
-  const FodinhaPage({Key? key}) : super(key: key);
+  const FodinhaPage({super.key});
 
   @override
   State<FodinhaPage> createState() => _FodinhaPageState();
@@ -147,8 +147,8 @@ class _FodinhaPageState extends State<FodinhaPage> {
                           items: List.generate(6, (index) => index + 2)
                               .map(
                                 (e) => DropdownMenuItem(
-                                  child: Text('$e'),
                                   value: e,
+                                  child: Text('$e'),
                                 ),
                               )
                               .toList(),
@@ -169,8 +169,8 @@ class _FodinhaPageState extends State<FodinhaPage> {
                           items: List.generate(10, (index) => index + 1)
                               .map(
                                 (e) => DropdownMenuItem(
-                                  child: Text('$e'),
                                   value: e,
+                                  child: Text('$e'),
                                 ),
                               )
                               .toList(),
@@ -189,10 +189,10 @@ class _FodinhaPageState extends State<FodinhaPage> {
                     ),
                     ElevatedButton(
                       onPressed: _setDefault,
-                      child: const Icon(Icons.settings_backup_restore),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                       ),
+                      child: const Icon(Icons.settings_backup_restore),
                     ),
                   ],
                 ),

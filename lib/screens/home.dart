@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vibration/vibration.dart';
-import 'truco.dart';
-import 'configs.dart';
-import './counting games/home.dart';
+import 'package:trucaralho/screens/truco.dart';
+import 'package:trucaralho/screens/configs.dart';
+import 'package:trucaralho/screens/counting games/home.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required});

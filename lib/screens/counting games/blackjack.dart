@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../logic/bet.dart';
-import '../../logic/historico.dart';
-import '../../components/player_area.dart';
-import '../../logic/howTo.dart';
+import 'package:trucaralho/logic/bet.dart';
+import 'package:trucaralho/logic/historico.dart';
+import 'package:trucaralho/components/player_area.dart';
+import '../../logic/how_to.dart';
 
 class BlackJackPage extends StatefulWidget {
-  const BlackJackPage({Key? key}) : super(key: key);
+  const BlackJackPage({super.key});
 
   @override
   State<BlackJackPage> createState() => _BlackJackPageState();
@@ -218,7 +218,7 @@ class _BlackJackPageState extends State<BlackJackPage> {
                     },
                   ),
                   SizedBox(height: 20),
-                  ElevatedButton(onPressed: _changeUp, child: Text('$carta')),
+                  ElevatedButton(onPressed: _changeUp, child: Text(carta)),
                   SizedBox(height: 20),
                   ElevatedButton(onPressed: _reset, child: Icon(Icons.refresh)),
                 ],

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../logic/truco.dart';
-import '../components/player_area.dart';
-import '../components/animated_card.dart';
-import '../requests.dart';
+import 'package:trucaralho/logic/truco.dart';
+import 'package:trucaralho/components/player_area.dart';
+import 'package:trucaralho/components/animated_card.dart';
+import 'package:trucaralho/requests.dart';
 
 class TrucoPage extends StatefulWidget {
   const TrucoPage({super.key});

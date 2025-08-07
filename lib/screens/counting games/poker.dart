@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../components/player_area.dart';
-import '../../logic/bet.dart';
-import '../../logic/chip.dart';
-import '../../logic/historico.dart';
-import '../../logic/howTo.dart';
+import 'package:trucaralho/components/player_area.dart';
+import 'package:trucaralho/logic/bet.dart';
+import 'package:trucaralho/logic/chip.dart';
+import 'package:trucaralho/logic/historico.dart';
+import 'package:trucaralho/logic/how_to.dart';
 
 class PokerPage extends StatefulWidget {
-  const PokerPage({Key? key}) : super(key: key);
+  const PokerPage({super.key});
 
   @override
   State<PokerPage> createState() => _PokerPageState();
@@ -37,7 +37,7 @@ class _PokerPageState extends State<PokerPage> {
     await showModalBottomSheet(
       context: context,
       builder: (_) {
-        return PokerCall(
+        return pokerCall(
           (int betAmount) => handleCall(side, betAmount),
           side,
           leftValue,
@@ -60,7 +60,7 @@ class _PokerPageState extends State<PokerPage> {
       currentBet = amount;
       gamePhase = 'called';
       lastAction =
-          '${side == 'left' ? 'Convidado' : 'Casa'} fez CALL de \$${amount}';
+          '${side == 'left' ? 'Convidado' : 'Casa'} fez CALL de \$$amount';
       actionDetect = true;
     });
 
@@ -70,7 +70,7 @@ class _PokerPageState extends State<PokerPage> {
       'Poker',
       side == 'left' ? 'Convidado' : 'Casa',
       amount: amount,
-      details: 'Aposta inicial de \$${amount}',
+      details: 'Aposta inicial de \$$amount',
     );
 
     Navigator.pop(context);
@@ -98,7 +98,7 @@ class _PokerPageState extends State<PokerPage> {
           }
           pot += currentBet;
           lastAction =
-              '${side == 'left' ? 'Convidado' : 'Casa'} fez CHECK (${currentBet})';
+              '${side == 'left' ? 'Convidado' : 'Casa'} fez CHECK ($currentBet)';
           gamePhase = 'showdown';
           actionDetect = true;
         });
@@ -158,7 +158,7 @@ class _PokerPageState extends State<PokerPage> {
       'FOLD',
       'Poker',
       side == 'left' ? 'Convidado' : 'Casa',
-      details: 'Desistiu da rodada, perdendo \$${pot}',
+      details: 'Desistiu da rodada, perdendo \$$pot',
     );
 
     _win(winner);
@@ -194,7 +194,7 @@ class _PokerPageState extends State<PokerPage> {
       currentBet = totalBet;
       gamePhase = 'raised';
       lastAction =
-          '${side == 'left' ? 'Convidado' : 'Casa'} fez RAISE para \$${totalBet}';
+          '${side == 'left' ? 'Convidado' : 'Casa'} fez RAISE para \$$totalBet';
       actionDetect = false;
     });
     Navigator.pop(context);
@@ -249,7 +249,7 @@ class _PokerPageState extends State<PokerPage> {
                 Text('Você tem certeza que quer dar ALL IN?'),
                 SizedBox(height: 10),
                 Text('Isso colocará 10 chips ${fichaMaior.nome}.'),
-                Text('Equivalente a \$${allInAmount}'),
+                Text('Equivalente a \$$allInAmount'),
               ],
             ),
           ),
@@ -289,13 +289,13 @@ class _PokerPageState extends State<PokerPage> {
       currentBet = amount;
       gamePhase = 'all_in';
       lastAction =
-          '${side == 'left' ? 'Convidado' : 'Casa'} fez ALL IN: \$${amount} (10x ${fichaName})';
+          '${side == 'left' ? 'Convidado' : 'Casa'} fez ALL IN: \$$amount (10x $fichaName)';
 
       addToHistory(
         'ALL IN',
         'Poker',
         side == 'left' ? 'Convidado' : 'Casa',
-        details: 'Aumentou o valor em \$${amount}',
+        details: 'Aumentou o valor em \$$amount',
       );
     });
   }
@@ -325,7 +325,7 @@ class _PokerPageState extends State<PokerPage> {
         'Poker',
         side == 'left' ? 'Convidado' : 'Casa',
         amount: opponentBet,
-        details: 'Aceitou a aposta de \$${opponentBet}',
+        details: 'Aceitou a aposta de \$$opponentBet',
       );
     }
   }
@@ -416,7 +416,7 @@ class _PokerPageState extends State<PokerPage> {
                 child: Column(
                   children: [
                     Text(
-                      'Pot: \$${pot}',
+                      'Pot: \$$pot',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -425,7 +425,7 @@ class _PokerPageState extends State<PokerPage> {
                     ),
                     if (currentBet > 0)
                       Text(
-                        'Aposta atual: \$${currentBet}',
+                        'Aposta atual: \$$currentBet',
                         style: TextStyle(fontSize: 18, color: Colors.yellow),
                       ),
                     if (lastAction.isNotEmpty)

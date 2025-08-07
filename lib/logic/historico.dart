@@ -114,7 +114,7 @@ void showGameHistory(BuildContext context) {
                         style: TextStyle(color: Colors.grey[400]),
                       ),
                       Text(
-                        '\$${pot}',
+                        '\$$pot',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -332,7 +332,7 @@ Widget historyTile(Map<String, dynamic> entry, int index) {
           if (amount != null) ...[
             SizedBox(width: 8),
             Text(
-              '\$${amount}',
+              '\$$amount',
               style: TextStyle(
                 color: Colors.green[300],
                 fontWeight: FontWeight.bold,

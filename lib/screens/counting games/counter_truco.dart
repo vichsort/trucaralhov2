@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../logic/historico.dart';
-import '../../components/player_area.dart';
-import '../../logic/howTo.dart';
+import 'package:trucaralho/logic/historico.dart';
+import 'package:trucaralho/components/player_area.dart';
+import 'package:trucaralho/logic/howTo.dart';
 
 class CounterTrucoPage extends StatefulWidget {
-  const CounterTrucoPage({Key? key}) : super(key: key);
+  const CounterTrucoPage({super.key});
 
   @override
   State<CounterTrucoPage> createState() => _CounterTrucoPageState();
