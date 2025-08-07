@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vibration/vibration.dart';
 import 'truco.dart';
+import 'configs.dart';
 import './counting games/home.dart';
 
 class HomePage extends StatefulWidget {
@@ -111,10 +112,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                       _buildGameButton(
                         'Configurações',
-                        () => ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Config não implementado.'),
-                          ),
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ConfigPage()),
                         ),
                       ),
                       _buildGameButton(
