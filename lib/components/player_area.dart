@@ -7,6 +7,7 @@ Widget buildPlayer1Area(
   void Function(int) onCardTapped,
   VoidCallback startGame,
   List<GlobalKey> keys,
+  bool isMyTurn,
 ) {
   return Container(
     padding: const EdgeInsets.all(16),
@@ -29,7 +30,12 @@ Widget buildPlayer1Area(
                   onTap: () => onCardTapped(index),
                   child: Container(
                     key: key,
-                    child: buildCardFront(carta.imageUrl, index, onCardTapped),
+                    child: buildCardFront(
+                      carta.imageUrl,
+                      index,
+                      onCardTapped,
+                      isMyTurn,
+                    ),
                   ),
                 ),
               );
@@ -65,9 +71,7 @@ Widget buildPlayer2Area(
                 child: Container(key: key, child: buildCardBack()),
               );
             }),
-          )
-        else
-          const Text('Nenhuma carta disponível'),
+          ),
       ],
     ),
   );

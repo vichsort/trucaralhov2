@@ -195,6 +195,7 @@ class _TrucoPageState extends State<TrucoPage> {
                   onCardTapped,
                   startGame,
                   p1CardKeys,
+                  isMyTurn,
                 ),
               ],
             ),

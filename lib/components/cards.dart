@@ -50,33 +50,38 @@ Widget buildTableCard(String imageUrl) {
   );
 }
 
-// Largura: 57 Altura: 80
-
 Widget buildCardFront(
   String imageUrl,
   int index,
   Function(int) onCartaTapped,
+  bool enabled,
 ) {
   return GestureDetector(
-    onTap: () {
-      onCartaTapped(index);
-    },
-    child: Container(
-      width: kCardWidth,
-      height: kCardHeight,
-      decoration: _cardBaseDecoration,
-      child: ClipRRect(
-        borderRadius: kCardRadius,
-        child: Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return const Center(child: CircularProgressIndicator());
-          },
-          errorBuilder: (_, __, ___) {
-            return Container(color: Colors.black);
-          },
+    onTap: enabled ? () => onCartaTapped(index) : null,
+    child: Opacity(
+      opacity: enabled ? 1.0 : 0.6, // escurece um pouco
+      child: ColorFiltered(
+        colorFilter: enabled
+            ? const ColorFilter.mode(Colors.transparent, BlendMode.multiply)
+            : const ColorFilter.mode(Colors.grey, BlendMode.saturation),
+        child: Container(
+          width: kCardWidth,
+          height: kCardHeight,
+          decoration: _cardBaseDecoration,
+          child: ClipRRect(
+            borderRadius: kCardRadius,
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return const Center(child: CircularProgressIndicator());
+              },
+              errorBuilder: (_, __, ___) {
+                return Container(color: Colors.black);
+              },
+            ),
+          ),
         ),
       ),
     ),
