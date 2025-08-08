@@ -9,14 +9,41 @@ class ConfigPage extends StatefulWidget {
 }
 
 class _ConfigPageState extends State<ConfigPage> {
-  bool light0 = false;
-  bool light1 = true;
+  bool isVibrationEnabled = true;
+  bool isNotificationEnabled = true;
+  bool isDarkModeEnabled = true;
 
   Future<void> _vibrate() async {
     bool? hasVibrator = await Vibration.hasVibrator();
-    if (hasVibrator == true) {
+    if (hasVibrator == true && isVibrationEnabled) {
       Vibration.vibrate(duration: 50);
     }
+  }
+
+  Widget buildSwitchTile(
+    String title,
+    bool value,
+    void Function(bool) onChanged,
+  ) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: SwitchListTile(
+        title: Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        value: value,
+        onChanged: onChanged,
+        activeColor: const Color.fromARGB(255, 124, 201, 127),
+      ),
+    );
   }
 
   @override
@@ -34,7 +61,7 @@ class _ConfigPageState extends State<ConfigPage> {
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
+                children: [
                   const Text(
                     'Configurações',
                     style: TextStyle(
@@ -51,40 +78,25 @@ class _ConfigPageState extends State<ConfigPage> {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  Column(
-                    children: [
-                      SwitchListTile(
-                        title: const Text(
-                          'Notificações',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        value: light0,
-                        onChanged: (bool value) {
-                          setState(() {
-                            light0 = value;
-                          });
-                          if (value && light1) {
-                            _vibrate();
-                          }
-                        },
-                      ),
-                      SwitchListTile(
-                        title: const Text(
-                          'Vibração',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        value: light1,
-                        onChanged: (bool value) {
-                          setState(() {
-                            light1 = value;
-                          });
-                          if (value) {
-                            _vibrate();
-                          }
-                        },
-                      ),
-                    ],
+                  buildSwitchTile('Ativar Vibração', isVibrationEnabled, (
+                    value,
+                  ) {
+                    setState(() => isVibrationEnabled = value);
+                    _vibrate();
+                  }),
+                  buildSwitchTile(
+                    'Ativar Notificações',
+                    isNotificationEnabled,
+                    (value) {
+                      setState(() => isNotificationEnabled = value);
+                      _vibrate();
+                    },
                   ),
+                  buildSwitchTile('Modo Noturno', isDarkModeEnabled, (value) {
+                    setState(() => isDarkModeEnabled = value);
+                    _vibrate();
+                  }),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),
