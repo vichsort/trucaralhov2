@@ -12,7 +12,7 @@ class TrucoPage extends StatefulWidget {
 }
 
 class _TrucoPageState extends State<TrucoPage> {
-  TrucoGame game = TrucoGame();
+  late TrucoGame game;
 
   List<Carta> tableCards = [];
   List<Carta> p1Cards = [];
@@ -32,7 +32,8 @@ class _TrucoPageState extends State<TrucoPage> {
   @override
   void initState() {
     super.initState();
-    startGame();
+    game = TrucoGame(); // mantém placar
+    startGame(novaPartida: true);
   }
 
   void onCardTapped(int index) async {
@@ -75,10 +76,17 @@ class _TrucoPageState extends State<TrucoPage> {
 
   void nextTurn() async {
     while (!isMyTurn) {
+      // chance do adversário pedir truco
       if (game.decidirPedirTruco()) {
         bool aceitou = await _mostrarDialogoTruco();
         if (!aceitou) {
-          game.pontosTime2 += game.valorRodada;
+          int pontosGanhos = tableCards.isEmpty ? 1 : game.valorRodada;
+          game.pontosTime2 += pontosGanhos;
+          setState(() {
+            game.ultimoResultado =
+                "Você correu! Oponente ganhou +$pontosGanhos ponto(s)!";
+          });
+          await Future.delayed(const Duration(seconds: 1));
           startGame();
           return;
         }
@@ -117,8 +125,7 @@ class _TrucoPageState extends State<TrucoPage> {
 
   Future<List<Carta>> callCards() async {
     final apiCards = await deckService.drawCards(15);
-    final cards = apiCards.map<Carta>((card) => Carta.fromApi(card)).toList();
-    return cards;
+    return apiCards.map<Carta>((card) => Carta.fromApi(card)).toList();
   }
 
   Future<void> _opponentPlay() async {
@@ -130,12 +137,11 @@ class _TrucoPageState extends State<TrucoPage> {
     verifyEmpty();
   }
 
-  Future<void> startGame() async {
+  Future<void> startGame({bool novaPartida = false}) async {
     setState(() => isLoading = true);
     try {
-      game = TrucoGame();
       final cards = await callCards();
-      game.startRound(cards);
+      game.startRound(cards, novaPartida: novaPartida);
       setState(() {
         tableCards = [cards[0]];
         p1Cards = cards.sublist(1, 4);
@@ -161,10 +167,25 @@ class _TrucoPageState extends State<TrucoPage> {
 
   void _pedirTruco() async {
     game.pedirTruco(true);
+
+    await Future.delayed(const Duration(seconds: 1));
+
     bool aceitou = game.avaliarAceitarTruco();
+
     if (!aceitou) {
-      game.pontosTime1 += game.valorRodada;
+      // Sempre ganha só 1 ponto quando o oponente corre
+      game.pontosTime1 += 1;
+      setState(() {
+        game.ultimoResultado = "Oponente correu! Você ganhou +1 ponto!";
+      });
+      await Future.delayed(const Duration(seconds: 1));
       startGame();
+    } else {
+      setState(() {
+        game.ultimoResultado = "Oponente aceitou!";
+      });
+      await Future.delayed(const Duration(milliseconds: 500));
+      nextTurn();
     }
   }
 
@@ -174,7 +195,10 @@ class _TrucoPageState extends State<TrucoPage> {
       appBar: AppBar(
         title: const Text('Truco'),
         actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: startGame),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => startGame(novaPartida: true),
+          ),
         ],
       ),
       body: Stack(
@@ -216,7 +240,6 @@ class _TrucoPageState extends State<TrucoPage> {
                     game.ultimoResultado,
                     style: const TextStyle(fontSize: 16, color: Colors.yellow),
                   ),
-
                 buildPlayer2Area(p2Cards, isLoading, p2CardKeys),
                 const Spacer(),
                 buildTableCardArea(tableCards, isLoading),
@@ -231,7 +254,7 @@ class _TrucoPageState extends State<TrucoPage> {
                 ),
                 ElevatedButton(
                   onPressed: isMyTurn ? _pedirTruco : null,
-                  child: Text("TRUCO! (${game.valorRodada})"),
+                  child: const Text("TRUCO!"),
                 ),
               ],
             ),

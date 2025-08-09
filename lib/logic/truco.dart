@@ -28,7 +28,7 @@ String normalizeValor(String value) {
     case 'KING':
       return 'K';
     default:
-      return value; // 2..7
+      return value;
   }
 }
 
@@ -70,15 +70,24 @@ class TrucoGame {
 
   int vitoriasRodadaP1 = 0;
   int vitoriasRodadaP2 = 0;
-  int rodadaAtual = 1; // 1 a 3
-  String ultimoResultado = ""; // Exibe "J1 venceu a vaza", etc.
+  int rodadaAtual = 1;
+  String ultimoResultado = "";
 
-  void startRound(List<Carta> cartasDistribuidas) {
+  bool trucoUsado = false;
+
+  void startRound(List<Carta> cartasDistribuidas, {bool novaPartida = false}) {
     if (cartasDistribuidas.length < 7) throw Exception("Cartas insuficientes");
+
+    if (novaPartida) {
+      pontosTime1 = 0;
+      pontosTime2 = 0;
+    }
+
     vira = cartasDistribuidas[0];
     definirManilhas(vira!.valor);
     maoJogador1 = cartasDistribuidas.sublist(1, 4);
     maoJogador2 = cartasDistribuidas.sublist(4, 7);
+
     vitoriasRodadaP1 = 0;
     vitoriasRodadaP2 = 0;
     rodadaAtual = 1;
@@ -87,6 +96,7 @@ class TrucoGame {
     valorRodada = 1;
     mesa = [null, null];
     ultimoResultado = "";
+    trucoUsado = false;
   }
 
   void definirManilhas(String valorVira) {
@@ -164,23 +174,29 @@ class TrucoGame {
   }
 
   void pedirTruco(bool isJogador1) {
+    if (trucoUsado) return;
+
     if (valorRodada == 1)
       valorRodada = 3;
     else if (valorRodada == 3)
       valorRodada = 6;
     else if (valorRodada == 6)
       valorRodada = 9;
+    else if (valorRodada == 9)
+      valorRodada = 12;
+
+    trucoUsado = true;
   }
 
   bool avaliarAceitarTruco() {
     int boas = maoJogador2.where((c) => isManilha(c) || c.forca >= 7).length;
     if (boas >= 2) return true;
     if (boas == 1 && valorRodada < 6) return true;
-    return false;
+    return (DateTime.now().millisecondsSinceEpoch % 100) < 50;
   }
 
   bool decidirPedirTruco() {
-    int boas = maoJogador2.where((c) => isManilha(c) || c.forca >= 8).length;
-    return boas >= 1 && valorRodada < 9;
+    bool chance = (DateTime.now().millisecondsSinceEpoch % 100) < 25;
+    return chance && valorRodada < 12 && !trucoUsado;
   }
 }
