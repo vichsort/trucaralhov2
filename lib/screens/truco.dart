@@ -12,16 +12,10 @@ class TrucoPage extends StatefulWidget {
 }
 
 class _TrucoPageState extends State<TrucoPage> {
-  /// Estado do jogo lógico
   TrucoGame game = TrucoGame();
 
-  /// Cartas visíveis na mesa (tanto vira quanto cartas jogadas)
   List<Carta> tableCards = [];
-
-  /// Cartas do Jogador 1 (você)
   List<Carta> p1Cards = [];
-
-  /// Cartas do Jogador 2 (oponente) - guardamos as cartas completas, mas exibimos viradas
   List<Carta> p2Cards = [];
 
   bool isLoading = false;
@@ -33,7 +27,6 @@ class _TrucoPageState extends State<TrucoPage> {
   List<GlobalKey> p2CardKeys = [];
   bool get isMyTurn => game.vez == Player.p1;
 
-  /// Serviço remoto
   final DeckService deckService = DeckService();
 
   @override
@@ -43,7 +36,7 @@ class _TrucoPageState extends State<TrucoPage> {
   }
 
   void onCardTapped(int index) async {
-    if (!isMyTurn) return; // bloqueia se não for sua vez
+    if (!isMyTurn) return;
     if (index < 0 || index >= p1Cards.length) return;
 
     final playedCard = p1Cards[index];
@@ -82,66 +75,71 @@ class _TrucoPageState extends State<TrucoPage> {
 
   void nextTurn() async {
     while (!isMyTurn) {
+      if (game.decidirPedirTruco()) {
+        bool aceitou = await _mostrarDialogoTruco();
+        if (!aceitou) {
+          game.pontosTime2 += game.valorRodada;
+          startGame();
+          return;
+        }
+      }
       await _opponentPlay();
       await Future.delayed(const Duration(milliseconds: 300));
     }
   }
 
+  Future<bool> _mostrarDialogoTruco() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Oponente pediu TRUCO!"),
+            content: const Text("Você aceita?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text("Correr"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text("Aceitar"),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
   void verifyEmpty() {
     if (p1Cards.isEmpty && p2Cards.isEmpty) {
-      // Reinicia o jogo
-      callCards();
       startGame();
     }
   }
 
   Future<List<Carta>> callCards() async {
-    // Busca cartas da API (List<Map<String,dynamic>>)
     final apiCards = await deckService.drawCards(15);
-
-    // Converte para modelo interno (List<Carta>)
     final cards = apiCards.map<Carta>((card) => Carta.fromApi(card)).toList();
     return cards;
   }
 
   Future<void> _opponentPlay() async {
     if (p2Cards.isEmpty || game.vez != Player.p2) return;
-
-    await Future.delayed(const Duration(seconds: 1)); // simula pensar
-
+    await Future.delayed(const Duration(seconds: 1));
     final playedCard = p2Cards.removeAt(0);
-
-    setState(() {
-      tableCards.add(playedCard);
-    });
-
+    setState(() => tableCards.add(playedCard));
     game.throwCard(playedCard, isJogador1: false);
     verifyEmpty();
   }
 
   Future<void> startGame() async {
     setState(() => isLoading = true);
-
     try {
-      // Reinicia lógica
       game = TrucoGame();
-
       final cards = await callCards();
-
-      // Inicializa rodada na lógica
       game.startRound(cards);
-
-      // Sincroniza estado visual
       setState(() {
-        if (cards.length >= 7) {
-          tableCards = [cards[0]];
-          p1Cards = cards.sublist(1, 4);
-          p2Cards = cards.sublist(4, 7);
-        } else {
-          p1Cards = cards.take(3).toList();
-          p2Cards = cards.skip(3).take(3).toList();
-          tableCards = [];
-        }
+        tableCards = [cards[0]];
+        p1Cards = cards.sublist(1, 4);
+        p2Cards = cards.sublist(4, 7);
         p1CardKeys = List.generate(p1Cards.length, (_) => GlobalKey());
         p2CardKeys = List.generate(p2Cards.length, (_) => GlobalKey());
       });
@@ -157,9 +155,16 @@ class _TrucoPageState extends State<TrucoPage> {
         tableCards = [];
       });
     } finally {
-      if (mounted) {
-        setState(() => isLoading = false);
-      }
+      if (mounted) setState(() => isLoading = false);
+    }
+  }
+
+  void _pedirTruco() async {
+    game.pedirTruco(true);
+    bool aceitou = game.avaliarAceitarTruco();
+    if (!aceitou) {
+      game.pontosTime1 += game.valorRodada;
+      startGame();
     }
   }
 
@@ -185,6 +190,33 @@ class _TrucoPageState extends State<TrucoPage> {
             ),
             child: Column(
               children: [
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Nós: ${game.pontosTime1}",
+                      style: const TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                    const SizedBox(width: 20),
+                    Text(
+                      "Eles: ${game.pontosTime2}",
+                      style: const TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  "Rodada ${game.rodadaAtual} - Valor: ${game.valorRodada}",
+                  style: const TextStyle(fontSize: 18, color: Colors.white),
+                ),
+                const SizedBox(height: 5),
+                if (game.ultimoResultado.isNotEmpty)
+                  Text(
+                    game.ultimoResultado,
+                    style: const TextStyle(fontSize: 16, color: Colors.yellow),
+                  ),
+
                 buildPlayer2Area(p2Cards, isLoading, p2CardKeys),
                 const Spacer(),
                 buildTableCardArea(tableCards, isLoading),
@@ -197,11 +229,13 @@ class _TrucoPageState extends State<TrucoPage> {
                   p1CardKeys,
                   isMyTurn,
                 ),
+                ElevatedButton(
+                  onPressed: isMyTurn ? _pedirTruco : null,
+                  child: Text("TRUCO! (${game.valorRodada})"),
+                ),
               ],
             ),
           ),
-
-          // Carta sendo animada
           if (animatingCard != null)
             AnimatedCard(card: animatingCard!, start: cardStart, end: cardEnd),
         ],
