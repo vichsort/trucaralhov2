@@ -30,7 +30,7 @@ String normalizeValor(String value) {
     case 'KING':
       return 'K';
     default:
-      return value; // 2..7 or numeric strings
+      return value;
   }
 }
 
@@ -78,7 +78,7 @@ class TrucoGame {
   int rodadaAtual = 1;
   String ultimoResultado = "";
 
-  bool trucoUsado = false; // só 1 pedido por rodada
+  bool trucoUsado = false;
 
   final Random _rnd = Random();
 
@@ -94,7 +94,6 @@ class TrucoGame {
     vira = cartasDistribuidas[0];
     definirManilhas(vira!.valor);
 
-    // distribui mãos (referências aos mesmos objetos Carta das listas passadas)
     maoJogador1 = cartasDistribuidas.sublist(1, 4);
     maoJogador2 = cartasDistribuidas.sublist(4, 7);
 
@@ -117,13 +116,11 @@ class TrucoGame {
 
   bool isManilha(Carta carta) => manilhas.contains(carta.valor.toUpperCase());
 
-  /// retorna >0 se c1 vence, <0 se c2 vence, 0 empate
   int compareCards(Carta c1, Carta c2) {
     final manilha1 = isManilha(c1);
     final manilha2 = isManilha(c2);
 
     if (manilha1 && manilha2) {
-      // quando ambas manilhas, compara naipe (ordem do enum)
       return c1.naipe.index - c2.naipe.index;
     } else if (manilha1) {
       return 1;
@@ -142,8 +139,6 @@ class TrucoGame {
     if (i >= 0) {
       final playedCard = mao.removeAt(i);
       registerInTable(playedCard, isJogador1);
-    } else {
-      // carta não encontrada na mão (possível inconsistência externa)
     }
   }
 
@@ -164,17 +159,14 @@ class TrucoGame {
         vez = Player.p2;
         ultimoResultado = "Oponente ganhou a vaza $rodadaAtual!";
       } else {
-        // empate -> quem vazou antes (vaza) joga novamente
         vez = vaza;
         ultimoResultado = "Empate na vaza $rodadaAtual!";
       }
 
       vaza = vez;
-      mesa = [null, null];
       rodadaAtual++;
       verificarFimRodada();
     } else {
-      // passa a vez ao outro jogador
       vez = isJogador1 ? Player.p2 : Player.p1;
     }
   }
@@ -187,49 +179,53 @@ class TrucoGame {
       } else if (vitoriasRodadaP2 > vitoriasRodadaP1) {
         pontosTime2 += valorRodada;
         ultimoResultado = "Oponente ganhou a mão e fez +$valorRodada ponto(s)!";
-      } else {
-        // empates resolvidos como vaza do vaza — caso extremo
       }
     }
   }
 
-  /// Incrementa valorRodada seguindo a sequência 1 -> 3 -> 6 -> 9 -> 12.
-  /// Só permite um pedido por rodada (trucoUsado).
   void pedirTruco(bool isJogador1) {
     if (trucoUsado) return;
 
-    if (valorRodada == 1)
+    if (valorRodada == 1) {
       valorRodada = 3;
-    else if (valorRodada == 3)
+    } else if (valorRodada == 3) {
       valorRodada = 6;
-    else if (valorRodada == 6)
+    } else if (valorRodada == 6) {
       valorRodada = 9;
-    else if (valorRodada == 9)
+    } else if (valorRodada == 9) {
       valorRodada = 12;
+    }
 
     trucoUsado = true;
   }
 
-  /// Avalia (AI) aceitar truco com base nas cartas do oponente (maoJogador2)
-  /// usa heurística + aleatoriedade para variar comportamento.
+  void aceitarTruco() {
+    if (valorRodada == 1) {
+      valorRodada = 3;
+    } else if (valorRodada == 3) {
+      valorRodada = 6;
+    } else if (valorRodada == 6) {
+      valorRodada = 9;
+    } else if (valorRodada == 9) {
+      valorRodada = 12;
+    }
+    trucoUsado = false; // permite pedir de novo depois
+  }
+
   bool avaliarAceitarTruco() {
     int boas = maoJogador2.where((c) => isManilha(c) || c.forca >= 7).length;
     if (boas >= 2) return true;
     if (boas == 1 && valorRodada < 6) return true;
-    // chance aleatória se mão mediana
-    return _rnd.nextInt(100) < 45; // ~45% chance
+    return _rnd.nextInt(100) < 45;
   }
 
-  /// Decide se o oponente vai pedir truco (apenas quando não foi pedido ainda)
   bool decidirPedirTruco() {
-    if (trucoUsado) return false;
-    // chance moderada dependendo da força da mão
+    if (trucoUsado || valorRodada >= 12) return false;
     int boas = maoJogador2.where((c) => isManilha(c) || c.forca >= 8).length;
-    int baseChance = 6; // 6% base
+    int baseChance = 6;
     if (boas == 1) baseChance += 20;
     if (boas >= 2) baseChance += 40;
-    // cap
     int chance = baseChance.clamp(0, 70);
-    return _rnd.nextInt(100) < chance && valorRodada < 12;
+    return _rnd.nextInt(100) < chance;
   }
 }

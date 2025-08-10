@@ -19,25 +19,26 @@ class _TrucoPageState extends State<TrucoPage> {
   List<Carta> p2Cards = [];
 
   bool isLoading = false;
+  bool isLocked = false;
 
   Carta? animatingCard;
   Offset cardStart = Offset.zero;
   Offset cardEnd = Offset.zero;
   List<GlobalKey> p1CardKeys = [];
   List<GlobalKey> p2CardKeys = [];
-  bool get isMyTurn => game.vez == Player.p1;
+  bool get isMyTurn => game.vez == Player.p1 && !isLocked;
 
   final DeckService deckService = DeckService();
 
   @override
   void initState() {
     super.initState();
-    game = TrucoGame(); // mantém placar
+    game = TrucoGame();
     startGame(novaPartida: true);
   }
 
   void onCardTapped(int index) async {
-    if (!isMyTurn) return;
+    if (!isMyTurn || isLocked) return;
     if (index < 0 || index >= p1Cards.length) return;
 
     final playedCard = p1Cards[index];
@@ -69,18 +70,33 @@ class _TrucoPageState extends State<TrucoPage> {
     });
 
     game.throwCard(playedCard, isJogador1: true);
-    await Future.delayed(const Duration(milliseconds: 500));
-    nextTurn();
+    await _checkEndOfTrick();
     verifyEmpty();
+    nextTurn();
+  }
+
+  Future<void> _checkEndOfTrick() async {
+    if (game.mesa[0] != null && game.mesa[1] != null) {
+      setState(() => isLocked = true);
+      // Espera 5 segundos para avaliar as cartas antes de limpar
+      await Future.delayed(const Duration(seconds: 5));
+      setState(() {
+        tableCards.clear();
+        game.mesa = [null, null];
+        isLocked = false;
+      });
+    }
   }
 
   void nextTurn() async {
     while (!isMyTurn) {
-      // chance do adversário pedir truco
+      await Future.delayed(const Duration(seconds: 1)); // "pensa" antes de agir
+
+      // Oponente decide pedir truco aleatoriamente e progressivamente
       if (game.decidirPedirTruco()) {
         bool aceitou = await _mostrarDialogoTruco();
         if (!aceitou) {
-          int pontosGanhos = tableCards.isEmpty ? 1 : game.valorRodada;
+          int pontosGanhos = game.valorRodada;
           game.pontosTime2 += pontosGanhos;
           setState(() {
             game.ultimoResultado =
@@ -89,8 +105,12 @@ class _TrucoPageState extends State<TrucoPage> {
           await Future.delayed(const Duration(seconds: 1));
           startGame();
           return;
+        } else {
+          game.aceitarTruco();
+          setState(() {});
         }
       }
+
       await _opponentPlay();
       await Future.delayed(const Duration(milliseconds: 300));
     }
@@ -100,7 +120,10 @@ class _TrucoPageState extends State<TrucoPage> {
     return await showDialog<bool>(
           context: context,
           builder: (_) => AlertDialog(
-            title: const Text("Oponente pediu TRUCO!"),
+            title: Text(
+              "Oponente pediu ${_textoBotaoTruco()}",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             content: const Text("Você aceita?"),
             actions: [
               TextButton(
@@ -129,11 +152,12 @@ class _TrucoPageState extends State<TrucoPage> {
   }
 
   Future<void> _opponentPlay() async {
-    if (p2Cards.isEmpty || game.vez != Player.p2) return;
-    await Future.delayed(const Duration(seconds: 1));
+    if (p2Cards.isEmpty || game.vez != Player.p2 || isLocked) return;
+    await Future.delayed(const Duration(seconds: 1)); // pensa 1 segundo
     final playedCard = p2Cards.removeAt(0);
     setState(() => tableCards.add(playedCard));
     game.throwCard(playedCard, isJogador1: false);
+    await _checkEndOfTrick();
     verifyEmpty();
   }
 
@@ -173,10 +197,10 @@ class _TrucoPageState extends State<TrucoPage> {
     bool aceitou = game.avaliarAceitarTruco();
 
     if (!aceitou) {
-      // Sempre ganha só 1 ponto quando o oponente corre
-      game.pontosTime1 += 1;
+      game.pontosTime1 += game.valorRodada;
       setState(() {
-        game.ultimoResultado = "Oponente correu! Você ganhou +1 ponto!";
+        game.ultimoResultado =
+            "Oponente correu! Você ganhou +${game.valorRodada} ponto(s)!";
       });
       await Future.delayed(const Duration(seconds: 1));
       startGame();
@@ -186,6 +210,21 @@ class _TrucoPageState extends State<TrucoPage> {
       });
       await Future.delayed(const Duration(milliseconds: 500));
       nextTurn();
+    }
+  }
+
+  String _textoBotaoTruco() {
+    switch (game.valorRodada) {
+      case 1:
+        return "TRUCO!";
+      case 3:
+        return "SEIS!";
+      case 6:
+        return "NOVE!";
+      case 9:
+        return "DOZE!";
+      default:
+        return "TRUCO!";
     }
   }
 
@@ -254,7 +293,7 @@ class _TrucoPageState extends State<TrucoPage> {
                 ),
                 ElevatedButton(
                   onPressed: isMyTurn ? _pedirTruco : null,
-                  child: const Text("TRUCO!"),
+                  child: Text(_textoBotaoTruco()),
                 ),
               ],
             ),
