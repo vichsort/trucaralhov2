@@ -49,7 +49,7 @@ class Carta {
     );
   }
 
-  int get forca {
+  int get strenght {
     const ordem = ["4", "5", "6", "7", "Q", "J", "K", "A", "2", "3"];
     return ordem.indexOf(valor.toUpperCase());
   }
@@ -60,13 +60,13 @@ class Carta {
 
 class TrucoGame {
   List<Carta> maoJogador1 = [];
-  List<Carta> maoJogador2 = [];
+  List<Carta> player2_hand = [];
   Carta? vira;
   List<String> manilhas = [];
 
   int pontosTime1 = 0;
   int pontosTime2 = 0;
-  int valorRodada = 1;
+  int roundValue = 1;
 
   Player vez = Player.p1;
   Player vaza = Player.p1;
@@ -76,14 +76,14 @@ class TrucoGame {
   int vitoriasRodadaP1 = 0;
   int vitoriasRodadaP2 = 0;
   int rodadaAtual = 1;
-  String ultimoResultado = "";
+  String lastResult = "";
 
-  bool trucoUsado = false;
+  bool usedTruco = false;
 
   final Random _rnd = Random();
 
   void startRound(List<Carta> cartasDistribuidas, {bool novaPartida = false}) {
-    trucoUsado = false;
+    usedTruco = false;
     if (cartasDistribuidas.length < 7) throw Exception("Cartas insuficientes");
 
     if (novaPartida) {
@@ -95,17 +95,17 @@ class TrucoGame {
     definirManilhas(vira!.valor);
 
     maoJogador1 = cartasDistribuidas.sublist(1, 4);
-    maoJogador2 = cartasDistribuidas.sublist(4, 7);
+    player2_hand = cartasDistribuidas.sublist(4, 7);
 
     vitoriasRodadaP1 = 0;
     vitoriasRodadaP2 = 0;
     rodadaAtual = 1;
     vez = Player.p1;
     vaza = Player.p1;
-    valorRodada = 1;
+    roundValue = 1;
     mesa = [null, null];
-    ultimoResultado = "";
-    trucoUsado = false;
+    lastResult = "";
+    usedTruco = false;
   }
 
   void definirManilhas(String valorVira) {
@@ -127,14 +127,14 @@ class TrucoGame {
     } else if (manilha2) {
       return -1;
     } else {
-      return c1.forca - c2.forca;
+      return c1.strenght - c2.strenght;
     }
   }
 
   bool gameOver() => pontosTime1 >= 12 || pontosTime2 >= 12;
 
   void throwCard(Carta carta, {required bool isJogador1}) {
-    final mao = isJogador1 ? maoJogador1 : maoJogador2;
+    final mao = isJogador1 ? maoJogador1 : player2_hand;
     final i = mao.indexOf(carta);
     if (i >= 0) {
       final playedCard = mao.removeAt(i);
@@ -153,78 +153,82 @@ class TrucoGame {
       if (resultado > 0) {
         vitoriasRodadaP1++;
         vez = Player.p1;
-        ultimoResultado = "Você ganhou a vaza $rodadaAtual!";
+        lastResult = "Você ganhou a vaza $rodadaAtual!";
       } else if (resultado < 0) {
         vitoriasRodadaP2++;
         vez = Player.p2;
-        ultimoResultado = "Oponente ganhou a vaza $rodadaAtual!";
+        lastResult = "Oponente ganhou a vaza $rodadaAtual!";
       } else {
         vez = vaza;
-        ultimoResultado = "Empate na vaza $rodadaAtual!";
+        lastResult = "Empate na vaza $rodadaAtual!";
       }
 
       vaza = vez;
       rodadaAtual++;
-      verificarFimRodada();
+      verifyEndofRound();
     } else {
       vez = isJogador1 ? Player.p2 : Player.p1;
     }
   }
 
-  void verificarFimRodada() {
+  void verifyEndofRound() {
     if (vitoriasRodadaP1 == 2 || vitoriasRodadaP2 == 2 || rodadaAtual > 3) {
       if (vitoriasRodadaP1 > vitoriasRodadaP2) {
-        pontosTime1 += valorRodada;
-        ultimoResultado = "Você ganhou a mão e fez +$valorRodada ponto(s)!";
+        pontosTime1 += roundValue;
+        lastResult = "Você ganhou a mão e fez +$roundValue ponto(s)!";
       } else if (vitoriasRodadaP2 > vitoriasRodadaP1) {
-        pontosTime2 += valorRodada;
-        ultimoResultado = "Oponente ganhou a mão e fez +$valorRodada ponto(s)!";
+        pontosTime2 += roundValue;
+        lastResult = "Oponente ganhou a mão e fez +$roundValue ponto(s)!";
       }
     }
   }
 
   void pedirTruco(bool isJogador1) {
-    if (trucoUsado) return;
+    if (usedTruco) return;
 
-    if (valorRodada == 1) {
-      valorRodada = 3;
-    } else if (valorRodada == 3) {
-      valorRodada = 6;
-    } else if (valorRodada == 6) {
-      valorRodada = 9;
-    } else if (valorRodada == 9) {
-      valorRodada = 12;
+    if (roundValue == 1) {
+      roundValue = 1;
+    } else if (roundValue == 3) {
+      roundValue = 3;
+    } else if (roundValue == 6) {
+      roundValue = 6;
+    } else if (roundValue == 9) {
+      roundValue = 9;
     }
 
-    trucoUsado = true;
+    usedTruco = true;
   }
 
-  void aceitarTruco() {
-    if (valorRodada == 1) {
-      valorRodada = 3;
-    } else if (valorRodada == 3) {
-      valorRodada = 6;
-    } else if (valorRodada == 6) {
-      valorRodada = 9;
-    } else if (valorRodada == 9) {
-      valorRodada = 12;
+  void acceptTruco() {
+    if (roundValue == 1) {
+      roundValue = 3;
+    } else if (roundValue == 3) {
+      roundValue = 6;
+    } else if (roundValue == 6) {
+      roundValue = 9;
+    } else if (roundValue == 9) {
+      roundValue = 12;
     }
-    trucoUsado = false; // permite pedir de novo depois
+    usedTruco = false; // permite pedir de novo depois
   }
 
-  bool avaliarAceitarTruco() {
-    int boas = maoJogador2.where((c) => isManilha(c) || c.forca >= 7).length;
-    if (boas >= 2) return true;
-    if (boas == 1 && valorRodada < 6) return true;
+  bool avaliaracceptTruco() {
+    int goodCards = player2_hand
+        .where((c) => isManilha(c) || c.strenght >= 7)
+        .length;
+    if (goodCards >= 2) return true;
+    if (goodCards == 1 && roundValue < 6) return true;
     return _rnd.nextInt(100) < 45;
   }
 
   bool decidirPedirTruco() {
-    if (trucoUsado || valorRodada >= 12) return false;
-    int boas = maoJogador2.where((c) => isManilha(c) || c.forca >= 8).length;
+    if (usedTruco || roundValue >= 12) return false;
+    int goodCards = player2_hand
+        .where((c) => isManilha(c) || c.strenght >= 8)
+        .length;
     int baseChance = 6;
-    if (boas == 1) baseChance += 20;
-    if (boas >= 2) baseChance += 40;
+    if (goodCards == 1) baseChance += 20;
+    if (goodCards >= 2) baseChance += 40;
     int chance = baseChance.clamp(0, 70);
     return _rnd.nextInt(100) < chance;
   }

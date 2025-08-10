@@ -96,17 +96,17 @@ class _TrucoPageState extends State<TrucoPage> {
       if (game.decidirPedirTruco()) {
         bool aceitou = await _mostrarDialogoTruco();
         if (!aceitou) {
-          int pontosGanhos = game.valorRodada;
-          game.pontosTime2 += pontosGanhos;
+          int gainedPoints = game.roundValue;
+          game.pontosTime2 += gainedPoints;
           setState(() {
-            game.ultimoResultado =
-                "Você correu! Oponente ganhou +$pontosGanhos ponto(s)!";
+            game.lastResult =
+                "Você correu! Oponente ganhou +$gainedPoints ponto(s)!";
           });
           await Future.delayed(const Duration(seconds: 1));
           startGame();
           return;
         } else {
-          game.aceitarTruco();
+          game.acceptTruco();
           setState(() {});
         }
       }
@@ -194,19 +194,19 @@ class _TrucoPageState extends State<TrucoPage> {
 
     await Future.delayed(const Duration(seconds: 1));
 
-    bool aceitou = game.avaliarAceitarTruco();
+    bool aceitou = game.avaliaracceptTruco();
 
     if (!aceitou) {
-      game.pontosTime1 += game.valorRodada;
+      game.pontosTime1 += game.roundValue;
       setState(() {
-        game.ultimoResultado =
-            "Oponente correu! Você ganhou +${game.valorRodada} ponto(s)!";
+        game.lastResult =
+            "Oponente correu! Você ganhou +${game.roundValue} ponto(s)!";
       });
       await Future.delayed(const Duration(seconds: 1));
       startGame();
     } else {
       setState(() {
-        game.ultimoResultado = "Oponente aceitou!";
+        game.lastResult = "Oponente aceitou!";
       });
       await Future.delayed(const Duration(milliseconds: 500));
       nextTurn();
@@ -214,7 +214,7 @@ class _TrucoPageState extends State<TrucoPage> {
   }
 
   String _textoBotaoTruco() {
-    switch (game.valorRodada) {
+    switch (game.roundValue) {
       case 1:
         return "TRUCO!";
       case 3:
@@ -270,13 +270,13 @@ class _TrucoPageState extends State<TrucoPage> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  "Rodada ${game.rodadaAtual} - Valor: ${game.valorRodada}",
+                  "Rodada ${game.rodadaAtual} - Valor: ${game.roundValue}",
                   style: const TextStyle(fontSize: 18, color: Colors.white),
                 ),
                 const SizedBox(height: 5),
-                if (game.ultimoResultado.isNotEmpty)
+                if (game.lastResult.isNotEmpty)
                   Text(
-                    game.ultimoResultado,
+                    game.lastResult,
                     style: const TextStyle(fontSize: 16, color: Colors.yellow),
                   ),
                 buildPlayer2Area(p2Cards, isLoading, p2CardKeys),
