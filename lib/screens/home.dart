@@ -3,9 +3,10 @@ import 'package:vibration/vibration.dart';
 import 'package:trucaralho/screens/truco.dart';
 import 'package:trucaralho/screens/configs.dart';
 import 'package:trucaralho/screens/counting games/home.dart';
+import 'package:trucaralho/components/notifications.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -18,6 +19,7 @@ class _HomePageState extends State<HomePage> {
       child: ElevatedButton(
         onPressed: () async {
           await _vibrate();
+          SimpleNotification.startTimer();
           onPressed();
         },
         child: Text(text),
@@ -48,7 +50,6 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  // Título do jogo
                   const Text(
                     'Trucaralho',
                     style: TextStyle(
@@ -67,12 +68,11 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 30),
 
-                  // Logo do jogo
                   Container(
                     width: 250,
                     height: 250,
-                    decoration: BoxDecoration(
-                      image: const DecorationImage(
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
                         image: AssetImage('images/logo.png'),
                         fit: BoxFit.cover,
                       ),
@@ -81,14 +81,15 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 40),
 
-                  // Botões do menu
                   Column(
                     children: [
                       _buildGameButton(
                         'Jogar de 2',
                         () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => TrucoPage()),
+                          MaterialPageRoute(
+                            builder: (context) => const TrucoPage(),
+                          ),
                         ),
                       ),
                       _buildGameButton(
@@ -106,7 +107,7 @@ class _HomePageState extends State<HomePage> {
                         () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CounterHomePage(),
+                            builder: (context) => const CounterHomePage(),
                           ),
                         ),
                       ),
@@ -114,7 +115,9 @@ class _HomePageState extends State<HomePage> {
                         'Configurações',
                         () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => ConfigPage()),
+                          MaterialPageRoute(
+                            builder: (context) => const ConfigPage(),
+                          ),
                         ),
                       ),
                       _buildGameButton(
@@ -123,6 +126,18 @@ class _HomePageState extends State<HomePage> {
                           const SnackBar(
                             content: Text('Histórico ainda não implementado.'),
                           ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () => SimpleNotification.testNotification(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                        ),
+                        child: const Text(
+                          'Teste',
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
                     ],
