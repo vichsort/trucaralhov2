@@ -41,8 +41,6 @@ Widget buildPlayer1Area(
               );
             }).toList(),
           )
-        else
-          const Text('Nenhuma carta disponível'),
       ],
     ),
   );

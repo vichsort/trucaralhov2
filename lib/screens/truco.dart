@@ -26,6 +26,7 @@ class _TrucoPageState extends State<TrucoPage> {
   Offset cardEnd = Offset.zero;
   List<GlobalKey> p1CardKeys = [];
   List<GlobalKey> p2CardKeys = [];
+
   bool get isMyTurn => game.vez == Player.p1 && !isLocked;
 
   final DeckService deckService = DeckService();
@@ -33,7 +34,8 @@ class _TrucoPageState extends State<TrucoPage> {
   @override
   void initState() {
     super.initState();
-    game = TrucoGame();
+    // assumir que o oponente é IA (o TrucoGame já tem esse comportamento por padrão)
+    game = TrucoGame(opponentIsAI: true);
     startGame(novaPartida: true);
   }
 
@@ -60,6 +62,7 @@ class _TrucoPageState extends State<TrucoPage> {
       cardEnd = endOffset;
     });
 
+    // animação simples (o componente AnimatedCard faz a transição visual)
     await Future.delayed(const Duration(milliseconds: 500));
 
     setState(() {
@@ -78,8 +81,13 @@ class _TrucoPageState extends State<TrucoPage> {
   Future<void> _checkEndOfTrick() async {
     if (game.mesa[0] != null && game.mesa[1] != null) {
       setState(() => isLocked = true);
-      // Espera 5 segundos para avaliar as cartas antes de limpar
-      await Future.delayed(const Duration(seconds: 5));
+
+      // esperar brevemente para a UI mostrar as cartas / animação
+      await Future.delayed(const Duration(seconds: 1));
+
+      // mantém um tempo extra para avaliar (antes você tinha 5s; reduzi pra 1s + pequeno delay)
+      await Future.delayed(const Duration(milliseconds: 400));
+
       setState(() {
         tableCards.clear();
         game.mesa = [null, null];
@@ -89,23 +97,27 @@ class _TrucoPageState extends State<TrucoPage> {
   }
 
   void nextTurn() async {
+    // enquanto não for a vez do jogador, deixa a IA pensar e agir
     while (!isMyTurn) {
-      await Future.delayed(const Duration(seconds: 1)); // "pensa" antes de agir
+      await Future.delayed(const Duration(milliseconds: 10)); // pequena espera
 
-      // Oponente decide pedir truco aleatoriamente e progressivamente
+      // Oponente (IA) decide pedir truco — se decidir, mostra diálogo para o jogador humano.
       if (game.decidirPedirTruco()) {
+        // Quando a IA pede truco, o humano precisa decidir (diálogo).
         bool aceitou = await _mostrarDialogoTruco();
         if (!aceitou) {
-          int gainedPoints = game.roundValue;
+          // Humano correu: IA ganha os pontos atuais da rodada
+          final gainedPoints = game.roundValue;
           game.pointsP2 += gainedPoints;
           setState(() {
             game.lastResult =
                 "Você correu! Oponente ganhou +$gainedPoints ponto(s)!";
           });
-          await Future.delayed(const Duration(seconds: 1));
+          await Future.delayed(const Duration(milliseconds: 500));
           startGame();
           return;
         } else {
+          // Humano aceitou o truco pedido pela IA
           game.acceptTruco();
           setState(() {});
         }
@@ -117,6 +129,7 @@ class _TrucoPageState extends State<TrucoPage> {
   }
 
   Future<bool> _mostrarDialogoTruco() async {
+    // usado apenas quando a IA pede truco — questão do humano aceitar/recusar
     return await showDialog<bool>(
           context: context,
           builder: (_) => AlertDialog(
@@ -167,6 +180,7 @@ class _TrucoPageState extends State<TrucoPage> {
       final cards = await callCards();
       game.startRound(cards, novaPartida: novaPartida);
       setState(() {
+        // note: mantive seu comportamento anterior (cards[0] na mesa)
         tableCards = [cards[0]];
         p1Cards = cards.sublist(1, 4);
         p2Cards = cards.sublist(4, 7);
@@ -175,9 +189,9 @@ class _TrucoPageState extends State<TrucoPage> {
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Erro ao carregar cartas: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao carregar cartas: $e')),
+        );
       }
       setState(() {
         p1Cards = [];
@@ -189,26 +203,23 @@ class _TrucoPageState extends State<TrucoPage> {
     }
   }
 
+  /// Novo fluxo: quando o jogador pede truco, chamamos a regra central [requestTruco].
+  /// Se o oponente for IA, a decisão (aceitar/correr) será resolvida dentro do TrucoGame.
   void _pedirTruco() async {
-    game.pedirTruco(true);
+    // registra pedido e pega resultado (true = aceitou, false = correu)
+    final aceitou = game.requestTruco(Player.p1);
 
-    await Future.delayed(const Duration(seconds: 1));
-
-    bool aceitou = game.avaliaracceptTruco();
+    // atualiza UI imediatamente com lastResult / roundValue / pontos (TrucoGame já pode tê-las modificado)
+    setState(() {});
 
     if (!aceitou) {
-      game.pointsP1 += game.roundValue;
-      setState(() {
-        game.lastResult =
-            "Oponente correu! Você ganhou +${game.roundValue} ponto(s)!";
-      });
-      await Future.delayed(const Duration(seconds: 1));
+      // IA correu — inicia nova rodada após breve animação / mensagem
+      await Future.delayed(const Duration(milliseconds: 700));
       startGame();
+      return;
     } else {
-      setState(() {
-        game.lastResult = "Oponente aceitou!";
-      });
-      await Future.delayed(const Duration(milliseconds: 500));
+      // IA aceitou — segue o jogo (a vez pode mudar dependendo da lógica)
+      await Future.delayed(const Duration(milliseconds: 300));
       nextTurn();
     }
   }
@@ -233,12 +244,6 @@ class _TrucoPageState extends State<TrucoPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Truco'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => startGame(novaPartida: true),
-          ),
-        ],
       ),
       body: Stack(
         children: [
