@@ -3,7 +3,7 @@ import 'package:vibration/vibration.dart';
 import 'package:trucaralho/screens/truco.dart';
 import 'package:trucaralho/screens/configs.dart';
 import 'package:trucaralho/screens/counting games/home.dart';
-import 'package:trucaralho/components/notifications.dart';
+import 'package:trucaralho/logic/notifications.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

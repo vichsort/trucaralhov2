@@ -97,7 +97,7 @@ class _TrucoPageState extends State<TrucoPage> {
         bool aceitou = await _mostrarDialogoTruco();
         if (!aceitou) {
           int gainedPoints = game.roundValue;
-          game.pontosTime2 += gainedPoints;
+          game.pointsP2 += gainedPoints;
           setState(() {
             game.lastResult =
                 "Você correu! Oponente ganhou +$gainedPoints ponto(s)!";
@@ -197,7 +197,7 @@ class _TrucoPageState extends State<TrucoPage> {
     bool aceitou = game.avaliaracceptTruco();
 
     if (!aceitou) {
-      game.pontosTime1 += game.roundValue;
+      game.pointsP1 += game.roundValue;
       setState(() {
         game.lastResult =
             "Oponente correu! Você ganhou +${game.roundValue} ponto(s)!";
@@ -258,19 +258,19 @@ class _TrucoPageState extends State<TrucoPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Nós: ${game.pontosTime1}",
+                      "Nós: ${game.pointsP1}",
                       style: const TextStyle(fontSize: 20, color: Colors.white),
                     ),
                     const SizedBox(width: 20),
                     Text(
-                      "Eles: ${game.pontosTime2}",
+                      "Eles: ${game.pointsP2}",
                       style: const TextStyle(fontSize: 20, color: Colors.white),
                     ),
                   ],
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  "Rodada ${game.rodadaAtual} - Valor: ${game.roundValue}",
+                  "Rodada ${game.round} - Valor: ${game.roundValue}",
                   style: const TextStyle(fontSize: 18, color: Colors.white),
                 ),
                 const SizedBox(height: 5),
